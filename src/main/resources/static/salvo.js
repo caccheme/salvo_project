@@ -1,22 +1,30 @@
-$(function() {
-
+$(document).ready(function(){
     $.ajax({
       type: "GET",
       url: '/api/games',
       }).done(function ( data ) {
-      var items = [];
+      var games = [];
 
       $.each(data, function(key, val) {
-        items.push('<li id="' + key + '">Date Created:' + val.date_created + '</li>');
+//        var date = (new Date(val.date_created));
+        var formattedDate = new Date(val.date_created);
+        var d = formattedDate.getDate();
+        var m =  formattedDate.getMonth();
+        m += 1;  // JavaScript months are 0-11
+        var y = formattedDate.getFullYear();
+
+        games.push('<li id="' + key + '">Date Created:    ' + d + "-" + m + "-" + y + '</li>');
       });
 
       $('<ol/>', {
-        'class': 'my-new-list',
-        html: items.join('')
-      }).appendTo('body');
+        html: games.join('')
+      }).appendTo('div');
     });
 
-})
+});
+
+
+
 
 
 // //is working at index.html to give same as /games
