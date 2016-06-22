@@ -2,7 +2,7 @@ $(function() {
 
     $.ajax({
       type: "GET",
-      url: '/games',
+      url: '/api/games',
       }).done(function ( data ) {
       var items = [];
 
