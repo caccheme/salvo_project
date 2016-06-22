@@ -15,7 +15,7 @@ $(function() {
   function loadData() {
 //  commented out the below because using @RequestMapping in SalvoController now instead of JavaScript
 
-    $.get("/players")
+    $.get("/rest/players")
     .done(function(data) {
       showOutput(JSON.stringify(data, null, 2));
     })
@@ -23,7 +23,7 @@ $(function() {
       showOutput( "Failed: " + textStatus );
     });
 
-//    $.get("/games")
+//    $.get("/rest/games")
 //    .done(function(data) {
 //      showList(JSON.stringify(data, null, 2));
 //    })

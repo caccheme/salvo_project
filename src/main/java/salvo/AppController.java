@@ -12,7 +12,6 @@ import static java.util.stream.Collectors.toList;
 
 
 @RestController
-@RequestMapping("/api")
 public class AppController {
 
 
@@ -32,13 +31,13 @@ public class AppController {
 ////                repo.findAll().stream().map(Game::getId).collect(Collectors.toList()); //to get list of id's
 //        }
 
-        @RequestMapping("/gamePlayers")
+        @RequestMapping("/api/gamePlayers")
         public List<GamePlayer> getAllGamePlayers(Map<String, Object> games) {
                 return gp_repository.findAll().stream().collect(Collectors.toList());
 //                repo.findAll().stream().map(Game::getId).collect(Collectors.toList()); //to get list of id's
         }
 
-        @RequestMapping("/games")
+        @RequestMapping("/api/games")
         public List<Object> getAllGames() {
                 return  repo
                         .findAll()
