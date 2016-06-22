@@ -1,18 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="GradleLocalSettings">
-    <option name="modificationStamps">
-      <map>
-        <entry key="$USER_HOME$/charity-project" value="1453737888000" />
-        <entry key="$USER_HOME$/my_new_project" value="1466545088000" />
-        <entry key="$USER_HOME$/myproject" value="1454105976000" />
-        <entry key="$USER_HOME$/person-object-project" value="1453920393000" />
-        <entry key="$PROJECT_DIR$" value="1465621587000" />
-      </map>
-    </option>
-    <option name="externalProjectsViewState">
-      <projects_view />
-    </option>
+  <component name="EntryPointsManager">
+    <entry_points version="2.0" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="false">
     <OptionsSetting value="true" id="Add" />
