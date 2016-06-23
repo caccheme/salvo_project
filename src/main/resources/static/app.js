@@ -23,7 +23,7 @@ $(function() {
       showOutput( "Failed: " + textStatus );
     });
 
-//    $.get("/rest/games")
+//    $.get("/games")
 //    .done(function(data) {
 //      showList(JSON.stringify(data, null, 2));
 //    })
@@ -56,7 +56,7 @@ $(function() {
           'Content-Type': 'application/json'
       },
       dataType: "text",
-      url: "/players",
+      url: "/rest/players",
       data: JSON.stringify({ "firstName": firstName, "lastName": lastName })
     })
     .done(function( ) {

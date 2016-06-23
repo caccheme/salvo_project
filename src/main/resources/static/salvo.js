@@ -8,7 +8,12 @@ $(document).ready(function(){
       $.each(data, function(key, val) {
         var date = (new Date(val.date_created + (60*60*1000*key)));
 
-        games.push('<li id="' + key + '">Date Created:    ' + date + '</li>');
+        games.push('<li id="' + key + '">Date Created:    ' + date +
+        '</li>');
+        $.each(val.players, function(k,v) {
+          games.push('<ul><li id=" player' + key + '">Player email:    ' + v.email + '</li></ul>');
+        });
+
       });
 
       $('<ol/>', {
@@ -17,25 +22,4 @@ $(document).ready(function(){
     });
 
 });
-
-
-
-
-
-// //is working at index.html to give same as /games
-//  var items = $( "#gamesList" ).load( "/games", function(i) {
-//    alert( "Load was performed." );
-//  });
-
-
-    // //example from stackoverlow that I got working
-//      var countries = ['United States', 'Canada', 'Argentina', 'Armenia'];
-//      var cList = $('ol')
-//      $.each(countries, function(i)
-//      {
-//          var li = $('<li/>')
-//          .text(countries[i])
-//          .appendTo(cList);
-//
-//      });
 
