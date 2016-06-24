@@ -13,6 +13,10 @@ public class Ship {
     @OneToMany(mappedBy="ship", fetch=FetchType.EAGER)
     Set<ShipLocation> shipLocations;
 
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name="gamePlayer_id")
+    private GamePlayer gamePlayer;
+
     public Ship() { }
 
     public Ship(String shipType) {
@@ -37,6 +41,14 @@ public class Ship {
 
     public Set<ShipLocation> getShipLocations() {
         return shipLocations;
+    }
+
+    public GamePlayer getGamePlayer() {
+        return gamePlayer;
+    }
+
+    public void setGamePlayer(GamePlayer gamePlayer) {
+        this.gamePlayer = gamePlayer;
     }
 
     @Override
