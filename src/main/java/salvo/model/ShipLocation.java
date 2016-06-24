@@ -1,15 +1,18 @@
 package salvo.model;
 
 
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 public class ShipLocation {
     @Id
     @GeneratedValue(strategy= GenerationType.AUTO)
     long id;
     private String shipLocationCell;
+
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name="ship_id")
+    private Ship ship;
 
     public ShipLocation() { }
 
@@ -31,6 +34,14 @@ public class ShipLocation {
 
     public void setId(long id) {
         this.id = id;
+    }
+
+    public Ship getShip() {
+        return ship;
+    }
+
+    public void setShip(Ship ship) {
+        this.ship = ship;
     }
 
     @Override

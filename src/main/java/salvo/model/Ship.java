@@ -1,6 +1,7 @@
 package salvo.model;
 
 import javax.persistence.*;
+import java.util.Set;
 
 @Entity
 public class Ship {
@@ -8,6 +9,9 @@ public class Ship {
     @GeneratedValue(strategy= GenerationType.AUTO)
     long id;
     private String shipType;
+
+    @OneToMany(mappedBy="ship", fetch=FetchType.EAGER)
+    Set<ShipLocation> shipLocations;
 
     public Ship() { }
 
@@ -29,6 +33,10 @@ public class Ship {
 
     public void setId(long id) {
         this.id = id;
+    }
+
+    public Set<ShipLocation> getShipLocations() {
+        return shipLocations;
     }
 
     @Override
