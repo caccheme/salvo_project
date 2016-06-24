@@ -1,5 +1,7 @@
 package salvo.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import java.util.Date;
 import java.util.Set;
@@ -10,7 +12,7 @@ public class GamePlayer {
     @Id
     @GeneratedValue(strategy= GenerationType.AUTO)
     private long id;
-    private Date creationDate;
+    private Date joinDate;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name="player_id")
@@ -23,13 +25,21 @@ public class GamePlayer {
     @OneToMany(mappedBy="gamePlayer", fetch=FetchType.EAGER)
     Set<Ship> ships;
 
-    public GamePlayer() { }
+    public GamePlayer() { joinDate = new Date(); }
 
     public GamePlayer(Game game, Player player) {
-        Date creationDate = new Date();
         this.game = game;
         this.player = player;
     }
+
+    public Date getJoinDate() {
+        return joinDate;
+    }
+
+    public void setJoinDate(Date date) {
+        this.joinDate = date;
+    }
+
 
     public Player getPlayer() {
         return player;
@@ -47,6 +57,7 @@ public class GamePlayer {
         this.game = game;
     }
 
+    @JsonIgnore //to prevent infinite loop
     public Set<Ship> getShips() {
         return ships;
     }
