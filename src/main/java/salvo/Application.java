@@ -10,7 +10,7 @@ import salvo.model.*;
 public class Application {
 
 	private Player jack, chloe, kim, david, michelle;
-	private Game game1, game2, game3;
+	private Game game1, game2, game3, game4, game5, game6;
 
 	public static void main(String[] args) {
 		SpringApplication.run(Application.class);
@@ -26,18 +26,34 @@ public class Application {
 			Player kim = playerRepository.save(new Player("kim_bauer@gmail.com"));
 			Player david = playerRepository.save(new Player("palmer@whitehouse.gov"));
 			Player michelle = playerRepository.save(new Player("m.dessler@ctu.gov"));
+			Player tim = playerRepository.save(new Player("t.almeida@ctu.gov"));
 
-			// save three empty games
+			// save empty games
 			game1 = game_repository.save(new Game());
 			game2 = game_repository.save(new Game());
 			game3 = game_repository.save(new Game());
+			game4 = game_repository.save(new Game());
+			game5 = game_repository.save(new Game());
+			game6 = game_repository.save(new Game());
 
-//			 save first 2 players to game1 by making new GamePlayer objects
+//			 save players to games by making new GamePlayer objects
 			gp_repository.save(new GamePlayer(game1, jack));
 			gp_repository.save(new GamePlayer(game1, chloe));
 
-//			save player1 to game 2 by making new GamePlayer
 			gp_repository.save(new GamePlayer(game2, jack));
+			gp_repository.save(new GamePlayer(game2, chloe));
+
+			gp_repository.save(new GamePlayer(game3, chloe));
+			gp_repository.save(new GamePlayer(game3, tim));
+
+			gp_repository.save(new GamePlayer(game4, jack));
+			gp_repository.save(new GamePlayer(game4, chloe));
+
+			gp_repository.save(new GamePlayer(game5, tim));
+			gp_repository.save(new GamePlayer(game5, jack));
+
+			gp_repository.save(new GamePlayer(game6, david));
+
 
 
 		};
