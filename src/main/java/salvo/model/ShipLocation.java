@@ -3,6 +3,7 @@ package salvo.model;
 
 import javax.persistence.*;
 
+@Entity
 public class ShipLocation {
     @Id
     @GeneratedValue(strategy= GenerationType.AUTO)
@@ -16,7 +17,7 @@ public class ShipLocation {
 
     public ShipLocation() { }
 
-    public ShipLocation(String shipType) {
+    public ShipLocation(String shipLocationCell) {
         this.shipLocationCell = shipLocationCell;
     }
 
