@@ -17,7 +17,8 @@ public class ShipLocation {
 
     public ShipLocation() { }
 
-    public ShipLocation(String shipLocationCell) {
+    public ShipLocation(Ship ship, String shipLocationCell) {
+        this.ship = ship;
         this.shipLocationCell = shipLocationCell;
     }
 

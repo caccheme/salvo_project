@@ -19,8 +19,9 @@ public class Ship {
 
     public Ship() { }
 
-    public Ship(String shipType) {
+    public Ship(String shipType, GamePlayer gamePlayer) {
         this.shipType = shipType;
+        this.gamePlayer = gamePlayer;
     }
 
     public String getShipType() {
