@@ -2,14 +2,19 @@ package salvo.model;
 
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 public class ShipLocation {
     @Id
     @GeneratedValue(strategy= GenerationType.AUTO)
     long id;
-    private String shipLocationCell;
+//    private String shipLocationCell;
 
+    @ElementCollection
+    @Column(name="shipLocationCell")
+    private List<String> shipLocationCells = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name="ship_id")
@@ -17,17 +22,17 @@ public class ShipLocation {
 
     public ShipLocation() { }
 
-    public ShipLocation(Ship ship, String shipLocationCell) {
+    public ShipLocation(Ship ship, List<String> shipLocationCells) {
         this.ship = ship;
-        this.shipLocationCell = shipLocationCell;
+        this.shipLocationCells = shipLocationCells;
     }
 
-    public String getShipLocationCell() {
-        return shipLocationCell;
+    public List<String> getShipLocationCells() {
+        return shipLocationCells;
     }
 
-    public void setShipLocationCell(String shipLocationCell) {
-        this.shipLocationCell = shipLocationCell;
+    public void setShipLocationCells(List<String> shipLocationCells) {
+        this.shipLocationCells = shipLocationCells;
     }
 
     public long getId() {
@@ -49,8 +54,8 @@ public class ShipLocation {
     @Override
     public String toString() {
         return String.format(
-                "Ship[id=%d, shipLocationCell='%s']",
-                id, shipLocationCell);
+                "Ship[id=%d, shipLocationCells='%s']",
+                id, shipLocationCells);
     }
 
 }
