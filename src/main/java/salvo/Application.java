@@ -6,16 +6,14 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import salvo.model.*;
 
-import java.util.List;
-
 @SpringBootApplication
 public class Application {
 
-//	private Player jack, chloe, kim, david, michelle;
+	//	private Player jack, chloe, kim, david, michelle;
 	private Game game1, game2, game3, game4, game5, game6;
 	private GamePlayer gp1, gp2, gp3, gp4, gp5;
-	private Ship ship1, ship2, ship3, ship4, ship5, ship6;
-	private List<String> list1, list2, list3, list4, list5, list6;
+	private Ship ship1, ship2, ship3, ship4, ship5, ship6, ship7;
+	private ShipLocation sL1, sL2, sL3, sL4, sL5, sL6;
 
 	public static void main(String[] args) {
 		SpringApplication.run(Application.class);
@@ -31,7 +29,9 @@ public class Application {
 			// save a couple of players
 			Player jack = playerRepository.save(new Player("j.bauer@ctu.gov"));
 			Player chloe = playerRepository.save(new Player("c.obrian@ctu.gov"));
+			Player kim = playerRepository.save(new Player("kim_bauer@gmail.com"));
 			Player david = playerRepository.save(new Player("palmer@whitehouse.gov"));
+			Player michelle = playerRepository.save(new Player("m.dessler@ctu.gov"));
 			Player tim = playerRepository.save(new Player("t.almeida@ctu.gov"));
 
 			// save empty games
@@ -78,41 +78,34 @@ public class Application {
 			// save one ship to jack, game 2
 			ship6 = ship_repository.save(new Ship("cruiser", gp3));
 
-//When below is not commented out it builds fine but creates bean exception on bootRun
+			// create new shiplocation objects to hold all cell location of ships
+			// cell locations of ship1 cruiser for jack in game1
+			sl_repository.save(new ShipLocation(ship1, "H2"));
+			sl_repository.save(new ShipLocation(ship1, "H3"));
+			sl_repository.save(new ShipLocation(ship1, "H4"));
 
-//			// create new shiplocation objects to hold all cell location lists of ships
-//			// cell locations of ship1 cruiser for jack in game1 add to list1 and put in shipLocation object
-//			list1.add("H2");
-//			list1.add("H3");
-//			list1.add("H4");
-//			sl_repository.save(new ShipLocation(ship1, list1));
-//
-//			//cell locations of ship2 destroyer for jack in game1
-//			list2.add("E1");
-//			list2.add("F1");
-//			sl_repository.save(new ShipLocation(ship2, list2));
-//
-//			//cell locations of ship3 destroy for jack in game1
-//			list3.add("B4");
-//			list3.add("B5");
-//			sl_repository.save(new ShipLocation(ship3, list3));
-//
-//			//cell locations of ship4 cruiser for chloe in game1
-//			list4.add("B5");
-//			list4.add("C5");
-//			list4.add("D5");
-//			sl_repository.save(new ShipLocation(ship4, list4));
-//
-//			//cell locations of ship5 destroyer for chloe in game1
-//			list5.add("F1");
-//			list5.add("F2");
-//			sl_repository.save(new ShipLocation(ship5, list5));
-//
-//			//cell locations of ship6 cruiser for jack in game2
-//			list6.add("B5");
-//			list6.add("C5");
-//			list6.add("D5");
-//			sl_repository.save(new ShipLocation(ship6, list6));
+			//cell locations of ship2 destroyer for jack in game1
+			sl_repository.save(new ShipLocation(ship2, "E1"));
+			sl_repository.save(new ShipLocation(ship2, "F1"));
+
+			//cell locations of ship3 destroy for jack in game1
+			sl_repository.save(new ShipLocation(ship3, "B4"));
+			sl_repository.save(new ShipLocation(ship3, "B5"));
+
+			//cell locations of ship4 cruiser for chloe in game1
+			sl_repository.save(new ShipLocation(ship4, "B5"));
+			sl_repository.save(new ShipLocation(ship4, "C5"));
+			sl_repository.save(new ShipLocation(ship4, "D5"));
+
+			//cell locations of ship5 destroyer for chloe in game1
+			sl_repository.save(new ShipLocation(ship5, "F1"));
+			sl_repository.save(new ShipLocation(ship5, "F2"));
+
+			//cell locations of ship6 cruiser for jack in game2
+			sl_repository.save(new ShipLocation(ship6, "B5"));
+			sl_repository.save(new ShipLocation(ship6, "C5"));
+			sl_repository.save(new ShipLocation(ship6, "D5"));
+
 		};
 	}
 
