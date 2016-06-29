@@ -52,12 +52,12 @@ public class AppController {
 
                 dto.put("game_id", game.getId());
                 dto.put("date_created", game.getCreationDate());
-                dto.put("players", makePlayerDTO(game.getPlayers()));
+                dto.put("players", makePlayerList(game.getPlayers()));
 
                 return dto;
         }
 
-        private List<Player> makePlayerDTO(Set<GamePlayer> gamePlayers) {
+        private List<Player> makePlayerList(Set<GamePlayer> gamePlayers) {
                 return gamePlayers
                         .stream()
                         .map(gamePlayer -> gamePlayer.getPlayer())
