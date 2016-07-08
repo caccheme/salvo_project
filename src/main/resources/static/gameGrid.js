@@ -48,6 +48,8 @@ $(document).ready(function(){
                  else if (i > 0 && j > 0) {
                      var td = document.createElement('td');
                      //loop through game data and fill in grid where ships are ... still to do
+                     //the param obj search should give the gp id value and can use it in this loop
+
                      td.appendChild(document.createTextNode('data'))
 
                      tr.appendChild(td)
@@ -65,6 +67,17 @@ $(document).ready(function(){
          return res;
      }
 
+//from ebook example of how to pass URL parameters (i.e. game.html?gp=1)
+    function paramObj(search) {
+      var obj = {};
+      var reg = /(?:[?&]([^?&#=]+)(?:=([^&#]*))?)(?:#.*)?/g;
+
+      search.replace(reg, function(match, param, val) {
+        obj[decodeURIComponent(param)] = val === undefined ? "" : decodeURIComponent(val);
+      });
+
+      return obj;
+    }
 
 
 // This is the approach that I am taking for the above:
