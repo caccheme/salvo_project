@@ -1,6 +1,8 @@
 package salvo.model;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 
 @Entity
@@ -38,6 +40,7 @@ public class ShipLocation {
         this.id = id;
     }
 
+    @JsonIgnore //prevent infinite looping
     public Ship getShip() {
         return ship;
     }

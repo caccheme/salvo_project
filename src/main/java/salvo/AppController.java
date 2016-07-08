@@ -38,6 +38,26 @@ public class AppController {
 //                repo.findAll().stream().map(Game::getId).collect(Collectors.toList()); //to get list of id's
         }
 
+        @RequestMapping("/gp")
+        public List<Set<Ship>> makeGamePlayerShipLocationDTO(GamePlayer gamePlayer) {
+                Map<String, Object> dto = new LinkedHashMap<>();
+                //collect all ships/locations tied to gamePlayer
+                return gp_repository.findAll().stream().map(GamePlayer::getShips).collect(Collectors.toList());
+
+                //collect info for one gamePlayer only
+//                gamePlayer = gp_repository.findOne((long) 1);
+//                dto.put("ships", gamePlayer.getShips());
+//                dto.put("shipLocations", makeShipLocationsList(gamePlayer.getShips())); //simplified list of locations, same info as above line but neater nesting
+//                return dto;
+        }
+
+        private List<Set<ShipLocation>> makeShipLocationsList(Set<Ship> ships) {
+                return ships
+                        .stream()
+                        .map(ship -> ship.getShipLocations())
+                        .collect(Collectors.toList());
+        }
+
         @RequestMapping("/games")
         public List<Object> getAllGames() {
                 return  repo

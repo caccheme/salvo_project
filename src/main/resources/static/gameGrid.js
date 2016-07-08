@@ -4,15 +4,15 @@ $(document).ready(function(){
 
   $.ajax({
         method: "get",
-        url: "/api/games",
+        url: "/api/gp",
         dataType: 'json',
         success: function(data, textStatus, jqXHR) {
                    // since we are using jQuery, you don't need to parse response
-                   tableCreate();
+                   tableCreate(data);
         }
   });//end ajax
 
-     function tableCreate() {
+     function tableCreate(data) {
          var body = document.getElementsByTagName('body')[0];
          var tbl = document.createElement('table');
          tbl.style.width = '75%';
@@ -50,7 +50,7 @@ $(document).ready(function(){
                      //loop through game data and fill in grid where ships are ... still to do
                      //the param obj search should give the gp id value and can use it in this loop
 
-                     td.appendChild(document.createTextNode('data'))
+                     td.appendChild(document.createTextNode(data)) //currently just loading six Objects into grid
 
                      tr.appendChild(td)
                  }
