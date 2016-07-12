@@ -4,6 +4,7 @@ $(document).ready(function(){
     var gamePlayer_Id = getParameterByName('gp');
 //    console.log(gamePlayer_Id);
 
+//get shipLocation data for a specific gamePlayer_Id
   $.ajax({
         method: "get",
         url: '/api/gp/'+ gamePlayer_Id,
@@ -11,8 +12,9 @@ $(document).ready(function(){
         success: function(data, textStatus, jqXHR) {
                    // since we are using jQuery, you don't need to parse response
                    data = flattenArray(data.shipLocations);
-                   console.log(data);
+//                   console.log(data);
                    tableCreate(data);
+                   nameShow();
 
         }
   });//end ajax
@@ -22,10 +24,35 @@ $(document).ready(function(){
         return myNewArray;
     }
 
+    // get gamePlayer data
+    $.ajax({
+            method: "get",
+            url: '/api/gamePlayers/',
+            dataType: 'json',
+            success: function(gamePlayers, textStatus, jqXHR) {
+                getPlayerEmail(gamePlayers);
+            }
+    });//end ajax
+
+// gamePlayer id is the position in the gamePlayers data array, so gamePlayer id = 1 is gamePlayers[0] object
+// get gamePlayer email from gamePlayers object
+    function getPlayerEmail(gamePlayers) {
+        var result = ""
+            if (gamePlayers[gamePlayer_Id-1].player.id) {
+                result = gamePlayers[gamePlayer_Id-1].player.email;
+            }
+        emailShow("Welcome, "+ result + "!");
+    }
+
+// show email/name of player on web view
+    function emailShow(string) {
+        $("#player_email").text(string);
+    }
+
      function tableCreate(data) {
          var body = document.getElementsByTagName('body')[0];
          var tbl = document.createElement('table');
-//         tbl.style.width = '75%';
+         tbl.style.width = '35%';
          tbl.setAttribute('border', '1');
          tbl.setAttribute('text-align', 'center');
          var tbdy = document.createElement('tbody');
@@ -74,7 +101,7 @@ $(document).ready(function(){
                     var cellString = myConcatFunction(j,i);
 
                     //  loop over rest of grid, check for shipLocations, mark matching locations blue
-                    td.appendChild(document.createTextNode(cellString));
+//                    td.appendChild(document.createTextNode(cellString)); // mark cells so can visually check ship locations
                     if (checkShipLocations(data, cellString) == true) {
                        td.style.backgroundColor = "blue"
                     }
