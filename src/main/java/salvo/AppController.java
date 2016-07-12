@@ -1,6 +1,7 @@
 package salvo;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import salvo.model.*;
@@ -40,7 +41,32 @@ public class AppController {
 //                repo.findAll().stream().map(Game::getId).collect(Collectors.toList()); //to get list of id's
         }
 
-//to get ships data connected to gamePlayer ID for Game Grid
+        @RequestMapping("/gp/{gamePlayer_Id}")
+        public Map<String, Object> makeGamePlayerShipLocationDTO(@PathVariable Long gamePlayer_Id) {
+                Map<String, Object> dto = new LinkedHashMap<>();
+
+                //collect info for one gamePlayer only
+                GamePlayer gamePlayer = gp_repository.findOne(gamePlayer_Id);
+                dto.put("shipLocations", getShipLocations(gamePlayer.getShips()));
+                return dto;
+        }
+
+        private List<List<String>> getShipLocations(Set<Ship> ships) {
+                return ships
+                        .stream()
+                        .map(ship -> makeShipLocationsList(ship.getShipLocations()))
+                        .collect(Collectors.toList());
+        }
+
+        private List<String> makeShipLocationsList(Set<ShipLocation> shipLocations) {
+                return shipLocations
+                        .stream()
+                        .map(sL -> sL.getShipLocationCell())
+                        .collect(Collectors.toList());
+        }
+
+
+//to get ships data connected with gamePlayer ID for Game Grid
         @RequestMapping("/ships")
         public List<Object> getAllShips() {
                 return  gp_repository

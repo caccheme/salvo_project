@@ -1,16 +1,26 @@
 $(document).ready(function(){
 
 //create an 11x11 grid with headers 1-10 and row headers A-J:
+    var gamePlayer_Id = getParameterByName('gp');
+//    console.log(gamePlayer_Id);
 
   $.ajax({
         method: "get",
-        url: "/api/ships",
+        url: '/api/gp/'+ gamePlayer_Id,
         dataType: 'json',
         success: function(data, textStatus, jqXHR) {
                    // since we are using jQuery, you don't need to parse response
+                   data = flattenArray(data.shipLocations);
+                   console.log(data);
                    tableCreate(data);
+
         }
   });//end ajax
+
+    function flattenArray(myArray) {
+        var myNewArray = [].concat.apply([], myArray);
+        return myNewArray;
+    }
 
      function tableCreate(data) {
          var body = document.getElementsByTagName('body')[0];
@@ -53,9 +63,9 @@ $(document).ready(function(){
 //                     var specificData = testTheDataFunction(data);//apparently this returns something undefined
                       td.appendChild(document.createTextNode(" "));
 
-                      console.log(data[0].gamePlayer_id);
-                      console.log(data[0].shipLocations);
-                     if (data[0].shipLocations != null) {
+
+//                      console.log(data[0].shipLocations);
+                     if (data != null) {
                        td.style.backgroundColor = "blue"
                      }
 
