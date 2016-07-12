@@ -25,7 +25,7 @@ $(document).ready(function(){
      function tableCreate(data) {
          var body = document.getElementsByTagName('body')[0];
          var tbl = document.createElement('table');
-         tbl.style.width = '75%';
+//         tbl.style.width = '75%';
          tbl.setAttribute('border', '1');
          tbl.setAttribute('text-align', 'center');
          var tbdy = document.createElement('tbody');
@@ -60,14 +60,113 @@ $(document).ready(function(){
                      //loop through game data and fill in grid where ships are ... still to do
                      //the param obj search should give the gp id value and can use it in this loop
 
-//                     var specificData = testTheDataFunction(data);//apparently this returns something undefined
+
+// create cell location strings based on table position
+    var jArray = [" ", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J"]; //so jArray[1] should = "A", etc
+
+    function myConcatFunction(j, i) {
+        var str1 = jArray[j];
+        var str2 = i.toString();
+        var res = str1.concat(str2);
+        return res
+    }
+
+    var cellString = myConcatFunction(j,i);
+
+//  loop over first row of grid and check for shipLocations...still need to DRY this out
+                      if (i == 1 && j == 1){
+                        console.log(jArray[j]); // A
+                        console.log(i.toString()); //1
+                        console.log(myConcatFunction(j,i)); //A1
+
+                        td.appendChild(document.createTextNode(cellString));
+                        for (var n = 0; n < data.length; n++) {
+                            if (data[n] == cellString){
+                              td.style.backgroundColor = "blue"
+                            }
+                        }
+                      }
+                      if (i == 1 && j==2){
+                        td.appendChild(document.createTextNode("B1"))
+                        for (var n = 0; n < data.length; n++) {
+                            if (data[n] == "B1"){
+                              td.style.backgroundColor = "blue"
+                            }
+                        }
+                      }
+                      if (i == 1 && j==3){
+                        td.appendChild(document.createTextNode("C1"))
+                        for (var n = 0; n < data.length; n++) {
+                            if (data[n] == "C1"){
+                              td.style.backgroundColor = "blue"
+                            }
+                        }
+                      }
+                      if (i == 1 && j == 4){
+                        td.appendChild(document.createTextNode("D1"))
+                        for (var n = 0; n < data.length; n++) {
+                            if (data[n] == "D1"){
+                              td.style.backgroundColor = "blue"
+                            }
+                        }
+                      }
+                      if (i == 1 && j == 5){
+                        td.appendChild(document.createTextNode("E1"))
+                        for (var n = 0; n < data.length; n++) {
+                            if (data[n] == "E1"){
+                              td.style.backgroundColor = "blue"
+                            }
+                        }
+                      }
+                      if (i == 1 && j==6){
+                        td.appendChild(document.createTextNode("F1"))
+                            for (var n = 0; n < data.length; n++) {
+                                if (data[n] == "F1"){
+                                  td.style.backgroundColor = "blue"
+                                }
+                            }
+                      }
+                      if (i == 1 && j==7){
+                        td.appendChild(document.createTextNode("G1"))
+                        for (var n = 0; n < data.length; n++) {
+                            if (data[n] == "G1"){
+                              td.style.backgroundColor = "blue"
+                            }
+                        }
+                      }
+                      if (i == 1 && j == 8){
+                        td.appendChild(document.createTextNode("H1"))
+                        for (var n = 0; n < data.length; n++) {
+                            if (data[n] == "H1"){
+                              td.style.backgroundColor = "blue"
+                            }
+                        }
+                      }
+                      if (i == 1 && j == 9) {
+                        td.appendChild(document.createTextNode("I1"))
+                        for (var n = 0; n < data.length; n++) {
+                            if (data[n] == "I1"){
+                              td.style.backgroundColor = "blue"
+                            }
+                        }
+                      }
+                      if (i == 1 && j == 10) {
+                        td.appendChild(document.createTextNode("J1"))
+                        for (var n = 0; n < data.length; n++) {
+                            if (data[n] == "J1"){
+                              td.style.backgroundColor = "blue"
+                            }
+                        }
+                      }
+
+//loop over and create empty cells in rest of grid
                       td.appendChild(document.createTextNode(" "));
 
 
 //                      console.log(data[0].shipLocations);
-                     if (data != null) {
-                       td.style.backgroundColor = "blue"
-                     }
+//                     if (data != null) {
+//                       td.style.backgroundColor = "blue"
+//                     }
 
 //                     td.appendChild(document.createTextNode(specificData)); //currently just loading Objects into grid
                      //will put conditionals for grid elements here based on if has ship data for that grid cell
@@ -80,6 +179,15 @@ $(document).ready(function(){
          tbl.appendChild(tbdy);
          body.appendChild(tbl)
      }
+
+//     function createBlueCells(data, cellPosition){
+//       td.appendChild(document.createTextNode(cellPosition))
+//        for (var n = 0; n < data.length; n++) {
+//            if (data[n] == cellPosition){
+//              td.style.backgroundColor = "blue"
+//            }
+//        }
+//     }
 
 //     function testTheDataFunction(data){
 //        var gpVal = getParameterByName('gp')
