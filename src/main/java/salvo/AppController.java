@@ -24,6 +24,8 @@ public class AppController {
         private GamePlayerRepository gp_repository;
         @Autowired
         private PlayerRepository p_repository;
+        @Autowired
+        private ShipLocationRepository sl_repo;
 
 //works to get game objects list without player info attached
 //        @RequestMapping("/games")
@@ -38,24 +40,27 @@ public class AppController {
 //                repo.findAll().stream().map(Game::getId).collect(Collectors.toList()); //to get list of id's
         }
 
-        @RequestMapping("/gp")
-        public List<Set<Ship>> makeGamePlayerShipLocationDTO(GamePlayer gamePlayer) {
-                Map<String, Object> dto = new LinkedHashMap<>();
-                //collect all ships/locations tied to gamePlayer
-                return gp_repository.findAll().stream().map(GamePlayer::getShips).collect(Collectors.toList());
-
-                //collect info for one gamePlayer only
-//                gamePlayer = gp_repository.findOne((long) 1);
-//                dto.put("ships", gamePlayer.getShips());
-//                dto.put("shipLocations", makeShipLocationsList(gamePlayer.getShips())); //simplified list of locations, same info as above line but neater nesting
-//                return dto;
+//to get ships data connected to gamePlayer ID for Game Grid
+        @RequestMapping("/ships")
+        public List<Object> getAllShips() {
+                return  gp_repository
+                        .findAll()
+                        .stream()
+                        .map(g -> makeShipDTO(g))
+                        .collect(toList());
         }
 
-        private List<Set<ShipLocation>> makeShipLocationsList(Set<Ship> ships) {
-                return ships
-                        .stream()
-                        .map(ship -> ship.getShipLocations())
-                        .collect(Collectors.toList());
+        private Map<String, Object> makeShipDTO(GamePlayer gamePlayer) {
+                Map<String, Object> dto = new LinkedHashMap<String, Object>();
+
+                dto.put("gamePlayer_id", gamePlayer.getId());
+                dto.put("shipLocations", makeShipLocationsDTO(gamePlayer.getShips()));
+
+                return dto;
+        }
+
+        private List<Set<ShipLocation>> makeShipLocationsDTO(Set<Ship> ships) {
+                return ships.stream().map(s -> s.getShipLocations()).collect(Collectors.toList());
         }
 
         @RequestMapping("/games")
