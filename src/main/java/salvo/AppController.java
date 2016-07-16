@@ -23,10 +23,6 @@ public class AppController {
         private GameRepository repo;
         @Autowired
         private GamePlayerRepository gp_repository;
-        @Autowired
-        private PlayerRepository p_repository;
-        @Autowired
-        private ShipLocationRepository sl_repo;
 
 //works to get game objects list without player info attached
 //        @RequestMapping("/games")
@@ -39,6 +35,30 @@ public class AppController {
         public List<GamePlayer> getAllGamePlayers(Map<String, Object> games) {
                 return gp_repository.findAll().stream().collect(Collectors.toList());
 //                repo.findAll().stream().map(Game::getId).collect(Collectors.toList()); //to get list of id's
+        }
+
+        @RequestMapping("/gpSalvoLocations/{gamePlayer_Id}")
+        public Map<String, Object> makeGamePlayerSalvoLocationDTO(@PathVariable Long gamePlayer_Id) {
+                Map<String, Object> dto = new LinkedHashMap<>();
+
+                //collect salvo location info for one gamePlayer only
+                GamePlayer gamePlayer = gp_repository.findOne(gamePlayer_Id);
+                dto.put("salvoLocations", getSalvoLocations(gamePlayer.getSalvoes()));
+                return dto;
+        }
+
+        private List<List<String>> getSalvoLocations(Set<Salvo> salvoes) {
+                return salvoes
+                        .stream()
+                        .map(s -> makeSalvoLocationsList(s.getSalvoLocations()))
+                        .collect(Collectors.toList());
+        }
+
+        private List<String> makeSalvoLocationsList(Set<SalvoLocation> salvoLocations) {
+                return salvoLocations
+                        .stream()
+                        .map(s -> s.getSalvoLocationCell())
+                        .collect(Collectors.toList());
         }
 
         @RequestMapping("/gp/{gamePlayer_Id}")

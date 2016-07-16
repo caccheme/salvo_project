@@ -1,6 +1,7 @@
 package salvo.model;
 
 import javax.persistence.*;
+import java.util.Set;
 
 @Entity
 public class Salvo {
@@ -12,6 +13,9 @@ public class Salvo {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name="gamePlayer_id")
     private GamePlayer gamePlayer;
+
+    @OneToMany(mappedBy="salvo", fetch=FetchType.EAGER)
+    Set<SalvoLocation> salvoLocations;
 
     public Salvo() {}
 
@@ -44,4 +48,7 @@ public class Salvo {
         this.gamePlayer = gamePlayer;
     }
 
+    public Set<SalvoLocation> getSalvoLocations() {
+        return salvoLocations;
+    }
 }
