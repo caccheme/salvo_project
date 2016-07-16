@@ -60,7 +60,7 @@ $(document).ready(function(){
         $("#player_email").text(string);
     }
 
-     function tableCreate1(shipData, salvoData) {
+     function tableCreate1(shipData) {
          var body = document.getElementsByTagName('div')[1];
          var tbl = document.createElement('table');
          tbl.style.width = '35%';
