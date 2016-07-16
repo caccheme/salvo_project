@@ -18,7 +18,7 @@ public class SalvoLocation {
 
     public SalvoLocation() { }
 
-    public SalvoLocation(Ship ship, String shipLocationCell) {
+    public SalvoLocation(Salvo salvo, String salvoLocationCell) {
         this.salvo = salvo;
         this.salvoLocationCell = salvoLocationCell;
     }

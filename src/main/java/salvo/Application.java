@@ -13,7 +13,7 @@ public class Application {
 	private Game game1, game2, game3, game4, game5, game6;
 	private GamePlayer gp1, gp2, gp3, gp4, gp5;
 	private Ship ship1, ship2, ship3, ship4, ship5, ship6, ship7;
-	private ShipLocation sL1, sL2, sL3, sL4, sL5, sL6;
+	private Salvo salvo1, salvo2, salvo3;
 
 	public static void main(String[] args) {
 		SpringApplication.run(Application.class);
@@ -25,7 +25,8 @@ public class Application {
 								  GamePlayerRepository gp_repository,
 								  ShipRepository ship_repository,
 								  ShipLocationRepository sl_repository,
-								  SalvoRepository salvo_repository) {
+								  SalvoRepository salvo_repository,
+								  SalvoLocationRepository salvo_loc_repo) {
 		return (args) -> {
 			// save a couple of players
 			Player jack = playerRepository.save(new Player("j.bauer@ctu.gov"));
@@ -108,9 +109,23 @@ public class Application {
 			sl_repository.save(new ShipLocation(ship6, "D5"));
 
 			//create salvo for Jack(gp1) turn 1 & 2, create salvo for Chloe(gp2) turn 1
-			salvo_repository.save(new Salvo(gp1, 1));
-			salvo_repository.save(new Salvo(gp1, 2));
-			salvo_repository.save(new Salvo(gp2, 1));
+			salvo1 = salvo_repository.save(new Salvo(gp1, 1));
+			salvo2 = salvo_repository.save(new Salvo(gp1, 2));
+			salvo3 = salvo_repository.save(new Salvo(gp2, 1));
+
+			//create salvo locations for Jack(gp1) turn 1
+			salvo_loc_repo.save(new SalvoLocation(salvo1, "A1"));
+			salvo_loc_repo.save(new SalvoLocation(salvo1, "D3"));
+			salvo_loc_repo.save(new SalvoLocation(salvo1, "F5"));
+			salvo_loc_repo.save(new SalvoLocation(salvo1, "H10"));
+
+			//create salvo locations for Jack(gp1) turn 2
+			salvo_loc_repo.save(new SalvoLocation(salvo2, "C10"));
+			salvo_loc_repo.save(new SalvoLocation(salvo2, "A4"));
+
+			//create salvo locations for Chloe(gp2) turn 1
+			salvo_loc_repo.save(new SalvoLocation(salvo3, "B4"));
+			salvo_loc_repo.save(new SalvoLocation(salvo3, "B5"));
 
 		};
 	}
