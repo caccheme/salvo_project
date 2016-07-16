@@ -9,11 +9,11 @@ $(document).ready(function(){
         method: "get",
         url: '/api/gpShipLocations/'+ gamePlayer_Id,
         dataType: 'json',
-        success: function(data, textStatus, jqXHR) {
+        success: function(shipData, textStatus, jqXHR) {
                    // since we are using jQuery, you don't need to parse response
-                   data = flattenArray(data.shipLocations);
-//                   console.log(data);
-                   tableCreate(data);
+                   shipData = flattenArray(shipData.shipLocations);
+//                   console.log(shipData);
+                   tableCreate(shipData);
 
         }
   });//end ajax
@@ -48,7 +48,7 @@ $(document).ready(function(){
         $("#player_email").text(string);
     }
 
-     function tableCreate(data) {
+     function tableCreate(shipData) {
          var body = document.getElementsByTagName('body')[0];
          var tbl = document.createElement('table');
          tbl.style.width = '35%';
@@ -101,7 +101,7 @@ $(document).ready(function(){
 
                     //  loop over rest of grid, check for shipLocations, mark matching locations blue
 //                    td.appendChild(document.createTextNode(cellString)); // mark cells so can visually check ship locations
-                    if (checkShipLocations(data, cellString) == true) {
+                    if (checkLocations(shipData, cellString) == true) {
                        td.style.backgroundColor = "blue"
                     }
 
@@ -114,7 +114,7 @@ $(document).ready(function(){
          body.appendChild(tbl)
      }
 
-     function checkShipLocations(data, cellString){
+     function checkLocations(data, cellString){
         var result = false;
         for (var n = 0; n < data.length; n++) {
             if (data[n] == cellString){
