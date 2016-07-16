@@ -7,7 +7,7 @@ $(document).ready(function(){
 //get shipLocation data for a specific gamePlayer_Id
   $.ajax({
         method: "get",
-        url: '/api/gp/'+ gamePlayer_Id,
+        url: '/api/gpShipLocations/'+ gamePlayer_Id,
         dataType: 'json',
         success: function(data, textStatus, jqXHR) {
                    // since we are using jQuery, you don't need to parse response

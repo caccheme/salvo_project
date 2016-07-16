@@ -61,7 +61,7 @@ public class AppController {
                         .collect(Collectors.toList());
         }
 
-        @RequestMapping("/gp/{gamePlayer_Id}")
+        @RequestMapping("/gpShipLocations/{gamePlayer_Id}")
         public Map<String, Object> makeGamePlayerShipLocationDTO(@PathVariable Long gamePlayer_Id) {
                 Map<String, Object> dto = new LinkedHashMap<>();
 
