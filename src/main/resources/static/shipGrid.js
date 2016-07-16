@@ -60,7 +60,7 @@ $(document).ready(function(){
         $("#player_email").text(string);
     }
 
-     function tableCreate1(shipData) {
+     function tableCreate1(shipData, salvoData) {
          var body = document.getElementsByTagName('div')[1];
          var tbl = document.createElement('table');
          tbl.style.width = '35%';
@@ -116,6 +116,8 @@ $(document).ready(function(){
                     if (checkLocations(shipData, cellString) == true) {
                        td.style.backgroundColor = "blue"
                     }
+                    //still to do......should have code here, or somewhere similar, to pass salvoData for gamePlayer 2 (Chloe)
+                    //so that gamePlayer 1 (Jack) can see where she has hit his ships on his ship grid
 
                     tr.appendChild(td)
                  }
@@ -154,13 +156,7 @@ $(document).ready(function(){
         return decodeURIComponent(results[2].replace(/\+/g, " "));
     }
 
-
-// This is the approach that I am taking for the above:
-//  You write a nested loop to draw the table, and as you draw each cell you decide what to put in it, like this
-//  - for each row (from 1 to 10)
-//    — for each column (from A to J)
-//        if cell contains ship return HTML for a ship color block else return HTML for an empty cell
-
+//create salvo grid marked where gamePlayer has shot at opponent
      function tableCreate2(salvoData) {
          var body = document.getElementsByTagName('div')[2];
          var tbl = document.createElement('table');
@@ -216,6 +212,7 @@ $(document).ready(function(){
 //                    td.appendChild(document.createTextNode(cellString)); // mark cells so can visually check ship locations
                     if (checkLocations(salvoData, cellString) == true) {
                        td.style.backgroundColor = "orange"
+                      // td.appendChild(document.createTextNode(get turn number for the salvo))// to do...get turn number in the salvo cells
                     }
 
                     tr.appendChild(td)
