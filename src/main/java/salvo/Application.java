@@ -24,7 +24,8 @@ public class Application {
 								  GameRepository game_repository,
 								  GamePlayerRepository gp_repository,
 								  ShipRepository ship_repository,
-								  ShipLocationRepository sl_repository) {
+								  ShipLocationRepository sl_repository,
+								  SalvoRepository salvo_repository) {
 		return (args) -> {
 			// save a couple of players
 			Player jack = playerRepository.save(new Player("j.bauer@ctu.gov"));
@@ -105,6 +106,11 @@ public class Application {
 			sl_repository.save(new ShipLocation(ship6, "B5"));
 			sl_repository.save(new ShipLocation(ship6, "C5"));
 			sl_repository.save(new ShipLocation(ship6, "D5"));
+
+			//create salvo for Jack(gp1) turn 1 & 2, create salvo for Chloe(gp2) turn 1
+			salvo_repository.save(new Salvo(gp1, 1));
+			salvo_repository.save(new Salvo(gp1, 2));
+			salvo_repository.save(new Salvo(gp2, 1));
 
 		};
 	}
