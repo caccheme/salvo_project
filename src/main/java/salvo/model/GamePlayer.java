@@ -25,6 +25,9 @@ public class GamePlayer {
     @OneToMany(mappedBy="gamePlayer", fetch=FetchType.EAGER)
     Set<Ship> ships;
 
+    @OneToMany(mappedBy="gamePlayer", fetch=FetchType.EAGER)
+    Set<Salvo> salvoes;
+
     public GamePlayer() { joinDate = new Date(); }
 
     public GamePlayer(Game game, Player player) {
@@ -60,6 +63,11 @@ public class GamePlayer {
     @JsonIgnore //to prevent infinite loop
     public Set<Ship> getShips() {
         return ships;
+    }
+
+    @JsonIgnore //to prevent infinite loop
+    public Set<Salvo> getSalvoes() {
+        return salvoes;
     }
 
     @Override

@@ -14,7 +14,6 @@ $(document).ready(function(){
                    data = flattenArray(data.shipLocations);
 //                   console.log(data);
                    tableCreate(data);
-                   nameShow();
 
         }
   });//end ajax

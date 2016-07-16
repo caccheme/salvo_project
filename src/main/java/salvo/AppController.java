@@ -66,7 +66,7 @@ public class AppController {
         }
 
 
-//to get ships data connected with gamePlayer ID for Game Grid
+        //to get ships data connected with gamePlayer ID for Game Grid
         @RequestMapping("/ships")
         public List<Object> getAllShips() {
                 return  gp_repository
