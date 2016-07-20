@@ -60,15 +60,15 @@ public class AppController {
                 return salvoes
                         .stream()
                         .sorted(Comparator.comparing(Salvo::getId))
-                        .map(s -> getLocationStringList(s.getSalvoLocations()))
+                        .map(s -> getCellList(s.getSalvoLocations()))
                         .collect(Collectors.toList());
         }
 
-        private List<String> getLocationStringList(Set<SalvoLocation> salvoLocations){
+        private List<String> getCellList(Set<SalvoLocation> salvoLocations){
                 return salvoLocations
                         .stream()
                         .sorted(Comparator.comparing(SalvoLocation::getId))
-                        .map(s -> s.getSalvoLocationCell())
+                        .map(sL -> sL.getSalvoLocationCell())
                         .collect(Collectors.toList());
         }
 

@@ -23,6 +23,8 @@ $(document).ready(function(){
           success: function(salvo, textStatus, jqXHR) {
                      tableCreate2(salvo);
                      getShipHits(salvo);
+
+
           }
     });//end ajax
 
@@ -233,7 +235,8 @@ $(document).ready(function(){
 
                     //  loop over rest of grid, check for salvoLocations
                     if (checkLocations(getGamePlayerSalvoData(salvo), cellString) == true) {
-                       td.style.backgroundColor = "orange"
+                       td.style.backgroundColor = "orange";
+                       td.appendChild(document.createTextNode(getTurnNumber(salvo, cellString)));
                      }
                     tr.appendChild(td)
                  }
@@ -253,6 +256,21 @@ $(document).ready(function(){
         }
         return result;
       }
+
+// get turn number for each salvo shot at a certain location, to put into grid at that location
+    function getTurnNumber(data, cellString){
+        result = ""
+        for (var i = 0; i < data.length; i++) {
+            for (var j=0; j < data[i].salvo_locations.length; j++){
+                for (var k=0; k < data[i].salvo_locations[j].length; k++){
+                    if (data[i].salvo_locations[j][k] == cellString){
+                        result = j+1
+                    }
+                }
+            }
+        }
+        return result;
+    }
 
       function getGameID(data){
         var gameID = ""
