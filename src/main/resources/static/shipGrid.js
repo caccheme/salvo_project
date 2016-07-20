@@ -113,9 +113,6 @@ $(document).ready(function(){
 //                    td.appendChild(document.createTextNode(cellString)); // mark cells so can visually check ship locations
                     if (checkLocations(data, cellString) == true) {
                        td.style.backgroundColor = "blue"
-                       if (checkLocations(getOpponentSalvoData(data), cellString) == true){
-                            td.style.backgroundColor = "red"
-                       }
                     }
 
                     tr.appendChild(td)
@@ -137,7 +134,7 @@ $(document).ready(function(){
              //iterate through columns
              //columns would be accessed using the "col" variable assigned in the for loop
              var cellString = myConcatFunction(j,i);
-             if (checkLocations(getOpponentSalvoData(data), cellString) == true) {
+             if (row.cells[j].style.backgroundColor == "blue" && checkLocations(getOpponentSalvoData(data), cellString) == true) {
                     row.cells[j].style.backgroundColor = "red"
              }
            }
