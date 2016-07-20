@@ -1,8 +1,6 @@
 $(document).ready(function(){
 
-//create an 11x11 grid with headers 1-10 and row headers A-J:
     var gamePlayer_Id = getParameterByName('gp');
-//    console.log(gamePlayer_Id);
 
 //get shipLocation data for a specific gamePlayer_Id
   $.ajax({
@@ -10,38 +8,21 @@ $(document).ready(function(){
         url: '/api/gpShipLocations/'+ gamePlayer_Id,
         dataType: 'json',
         success: function(shipData, textStatus, jqXHR) {
-                   // since we are using jQuery, you don't need to parse response
                    shipData = flattenArray(shipData.shipLocations);
-//                   console.log(shipData);
                    tableCreate1(shipData);
 
         }
   });//end ajax
 
-//get salvoLocation data for a specific gamePlayer_Id
-//  $.ajax({
-//        method: "get",
-//        url: '/api/gpSalvoLocations/'+ gamePlayer_Id,
-//        dataType: 'json',
-//        success: function(salvoData, textStatus, jqXHR) {
-//                   salvoData = flattenArray(salvoData.salvoLocations);
-//                   tableCreate2(salvoData);
-//
-//        }
-//  });//end ajax
 
-  //get salvoLocation data for a specific gamePlayer_Id
+  //get salvoLocation data tied to gamePlayers and games
     $.ajax({
           method: "get",
           url: '/api/salvoes',
           dataType: 'json',
           success: function(salvo, textStatus, jqXHR) {
-                     salvo = flattenArray(salvo);
-//                    console.log(salvo);
-//                    console.log(flattenArray(salvo[0].salvo_locations)); // flattened array of salvo location cells for game1 player1
-//                    console.log(flattenArray(salvo[1].salvo_locations)); // flattened array of salvo locations cells for game1 player2
                      tableCreate2(salvo);
-
+                     getShipHits(salvo);
           }
     });//end ajax
 
@@ -51,7 +32,7 @@ $(document).ready(function(){
         return myNewArray;
     }
 
-    // get gamePlayer data
+// get gamePlayer data
     $.ajax({
             method: "get",
             url: '/api/gamePlayers/',
@@ -76,12 +57,13 @@ $(document).ready(function(){
         $("#player_email").text(string);
     }
 
-     function tableCreate1(shipData) {
+     function tableCreate1(data) {
          var body = document.getElementsByTagName('div')[1];
          var tbl = document.createElement('table');
          tbl.style.width = '35%';
          tbl.setAttribute('border', '1');
          tbl.setAttribute('text-align', 'center');
+         tbl.setAttribute('id', 'ship_table');
          var tbdy = document.createElement('tbody');
          for (var i = 0; i < 11; i++) {
              var tr = document.createElement('tr');
@@ -129,11 +111,12 @@ $(document).ready(function(){
 
                     //  loop over rest of grid, check for shipLocations, mark matching locations blue
 //                    td.appendChild(document.createTextNode(cellString)); // mark cells so can visually check ship locations
-                    if (checkLocations(shipData, cellString) == true) {
+                    if (checkLocations(data, cellString) == true) {
                        td.style.backgroundColor = "blue"
+                       if (checkLocations(getOpponentSalvoData(data), cellString) == true){
+                            td.style.backgroundColor = "red"
+                       }
                     }
-                    //still to do......should have code here, or somewhere similar, to pass salvoData for gamePlayer 2 (Chloe)
-                    //so that gamePlayer 1 (Jack) can see where she has hit his ships on his ship grid
 
                     tr.appendChild(td)
                  }
@@ -143,6 +126,33 @@ $(document).ready(function(){
          tbl.appendChild(tbdy);
          body.appendChild(tbl)
      }
+
+//mark hits by opponent player on displayed gamePlayer's ship grid in red
+     function getShipHits(data){
+        var table = document.getElementById("ship_table");
+        for (var i = 0, row; row = table.rows[i]; i++) {
+           //iterate through rows
+           //rows would be accessed using the "row" variable assigned in the for loop
+           for (var j = 0, col; col = row.cells[j]; j++) {
+             //iterate through columns
+             //columns would be accessed using the "col" variable assigned in the for loop
+             var cellString = myConcatFunction(j,i);
+             if (checkLocations(getOpponentSalvoData(data), cellString) == true) {
+                    row.cells[j].style.backgroundColor = "red"
+             }
+           }
+        }
+    }
+
+       // create string values based on table position
+      var jArray = [" ", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J"];
+
+      function myConcatFunction(j, i) {
+          var str1 = jArray[j];
+          var str2 = i.toString();
+          var res = str1.concat(str2);
+          return res
+      }
 
      function checkLocations(data, cellString){
         var result = false;
@@ -224,13 +234,10 @@ $(document).ready(function(){
 
                     var cellString = myConcatFunction(j,i);
 
-                    //  loop over rest of grid, check for shipLocations, mark matching locations blue
-//                    td.appendChild(document.createTextNode(cellString)); // mark cells so can visually check ship locations
+                    //  loop over rest of grid, check for salvoLocations
                     if (checkLocations(getGamePlayerSalvoData(salvo), cellString) == true) {
                        td.style.backgroundColor = "orange"
-                      // td.appendChild(document.createTextNode(get turn number for the salvo))// to do...get turn number in the salvo cells
-                    }
-
+                     }
                     tr.appendChild(td)
                  }
              }
@@ -270,6 +277,4 @@ $(document).ready(function(){
         return result;
       }
 
-
 });
-
