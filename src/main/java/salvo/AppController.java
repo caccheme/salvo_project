@@ -51,7 +51,7 @@ public class AppController {
 
                 dto.put("game_id", gamePlayer.getGame().getId());
                 dto.put("gamePlayer_id", gamePlayer.getId());
-                dto.put("savlo_locations", makeLocationList(gamePlayer.getSalvoes()));
+                dto.put("salvo_locations", makeLocationList(gamePlayer.getSalvoes()));
 
                 return dto;
         }

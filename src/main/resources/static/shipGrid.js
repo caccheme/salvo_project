@@ -19,16 +19,32 @@ $(document).ready(function(){
   });//end ajax
 
 //get salvoLocation data for a specific gamePlayer_Id
-  $.ajax({
-        method: "get",
-        url: '/api/gpSalvoLocations/'+ gamePlayer_Id,
-        dataType: 'json',
-        success: function(salvoData, textStatus, jqXHR) {
-                   salvoData = flattenArray(salvoData.salvoLocations);
-                   tableCreate2(salvoData);
+//  $.ajax({
+//        method: "get",
+//        url: '/api/gpSalvoLocations/'+ gamePlayer_Id,
+//        dataType: 'json',
+//        success: function(salvoData, textStatus, jqXHR) {
+//                   salvoData = flattenArray(salvoData.salvoLocations);
+//                   tableCreate2(salvoData);
+//
+//        }
+//  });//end ajax
 
-        }
-  });//end ajax
+  //get salvoLocation data for a specific gamePlayer_Id
+    $.ajax({
+          method: "get",
+          url: '/api/salvoes',
+          dataType: 'json',
+          success: function(salvo, textStatus, jqXHR) {
+                     salvo = flattenArray(salvo);
+//                    console.log(salvo);
+//                    console.log(flattenArray(salvo[0].salvo_locations)); // flattened array of salvo location cells for game1 player1
+//                    console.log(flattenArray(salvo[1].salvo_locations)); // flattened array of salvo locations cells for game1 player2
+                     tableCreate2(salvo);
+
+          }
+    });//end ajax
+
 
     function flattenArray(myArray) {
         var myNewArray = [].concat.apply([], myArray);
@@ -157,7 +173,7 @@ $(document).ready(function(){
     }
 
 //create salvo grid marked where gamePlayer has shot at opponent
-     function tableCreate2(salvoData) {
+     function tableCreate2(salvo) {
          var body = document.getElementsByTagName('div')[2];
          var tbl = document.createElement('table');
          tbl.style.width = '35%';
@@ -210,7 +226,7 @@ $(document).ready(function(){
 
                     //  loop over rest of grid, check for shipLocations, mark matching locations blue
 //                    td.appendChild(document.createTextNode(cellString)); // mark cells so can visually check ship locations
-                    if (checkLocations(salvoData, cellString) == true) {
+                    if (checkLocations(getGamePlayerSalvoData(salvo), cellString) == true) {
                        td.style.backgroundColor = "orange"
                       // td.appendChild(document.createTextNode(get turn number for the salvo))// to do...get turn number in the salvo cells
                     }
@@ -224,5 +240,36 @@ $(document).ready(function(){
          body.appendChild(tbl)
      }
 
+      function getGamePlayerSalvoData(data){
+        var result = ""
+        for (var i = 0; i < data.length; i++) {
+           if (data[i].gamePlayer_id == gamePlayer_Id) {
+                result = flattenArray(data[i].salvo_locations);
+           }
+        }
+        return result;
+      }
+
+      function getGameID(data){
+        var gameID = ""
+        for (var i = 0; i < data.length; i++) {
+            if (data[i].gamePlayer_id == gamePlayer_Id) {
+                gameID = data[i].game_id;
+            }
+        }
+        return gameID;
+      }
+
+      function getOpponentSalvoData(data) {
+        var result = ""
+            for (var i = 0; i < data.length; i++) {
+                if (data[i].game_id == getGameID(data)) {
+                    result = flattenArray(data[i].salvo_locations);
+                }
+            }
+        return result;
+      }
+
 
 });
+
