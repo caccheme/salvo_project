@@ -37,6 +37,41 @@ public class AppController {
 //                repo.findAll().stream().map(Game::getId).collect(Collectors.toList()); //to get list of id's
         }
 
+        @RequestMapping("/salvoes")
+        public List<Object> getAllSalvoes() {
+                return  gp_repository
+                        .findAll()
+                        .stream()
+                        .map(g -> makeSalvoDTO(g))
+                        .collect(toList());
+        }
+
+        private Map<String, Object> makeSalvoDTO(GamePlayer gamePlayer) {
+                Map<String, Object> dto = new LinkedHashMap<String, Object>();
+
+                dto.put("game_id", gamePlayer.getGame().getId());
+                dto.put("gamePlayer_id", gamePlayer.getId());
+                dto.put("savlo_locations", makeLocationList(gamePlayer.getSalvoes()));
+
+                return dto;
+        }
+
+        private List<List<String>> makeLocationList(Set<Salvo> salvoes) {
+                return salvoes
+                        .stream()
+                        .sorted(Comparator.comparing(Salvo::getId))
+                        .map(s -> getLocationStringList(s.getSalvoLocations()))
+                        .collect(Collectors.toList());
+        }
+
+        private List<String> getLocationStringList(Set<SalvoLocation> salvoLocations){
+                return salvoLocations
+                        .stream()
+                        .sorted(Comparator.comparing(SalvoLocation::getId))
+                        .map(s -> s.getSalvoLocationCell())
+                        .collect(Collectors.toList());
+        }
+
         @RequestMapping("/gpSalvoLocations/{gamePlayer_Id}")
         public Map<String, Object> makeGamePlayerSalvoLocationDTO(@PathVariable Long gamePlayer_Id) {
                 Map<String, Object> dto = new LinkedHashMap<>();
