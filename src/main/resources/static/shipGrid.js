@@ -23,8 +23,7 @@ $(document).ready(function(){
           success: function(salvo, textStatus, jqXHR) {
                      tableCreate2(salvo);
                      getShipHits(salvo);
-
-
+//
           }
     });//end ajax
 
@@ -136,8 +135,11 @@ $(document).ready(function(){
              //iterate through columns
              //columns would be accessed using the "col" variable assigned in the for loop
              var cellString = myConcatFunction(j,i);
-             if (row.cells[j].style.backgroundColor == "blue" && checkLocations(getOpponentSalvoData(data), cellString) == true) {
+             if (row.cells[j].style.backgroundColor == "blue" && checkLocations(flattenArray(getOpponentSalvoData(data)), cellString) == true) {
                     row.cells[j].style.backgroundColor = "red"
+                    var text = getOpponentTurnNumber(getOpponentSalvoData(data), cellString);
+                    row.cells[j].appendChild(document.createTextNode(text));
+
              }
            }
         }
@@ -272,6 +274,19 @@ $(document).ready(function(){
         return result;
     }
 
+// get opponent turn number from opponent salvo data and use to mark hits on ship grid
+    function getOpponentTurnNumber(data, cellString) {
+        result = ""
+            for (var i = 0; i < data.length; i++) {
+                for (var j=0; j < data[i].length; j++){
+                   if (data[i][j] == cellString){
+                         result = i+1;
+                   }
+                }
+            }
+        return result;
+    }
+
       function getGameID(data){
         var gameID = ""
         for (var i = 0; i < data.length; i++) {
@@ -286,7 +301,7 @@ $(document).ready(function(){
         var result = ""
             for (var i = 0; i < data.length; i++) {
                 if (data[i].game_id == getGameID(data)) {
-                    result = flattenArray(data[i].salvo_locations);
+                    result = (data[i].salvo_locations);
                 }
             }
         return result;
