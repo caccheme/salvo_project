@@ -135,8 +135,8 @@ public class Application {
 			score_repo.save(new GameScore(game1, chloe, 0));
 
 			//create tie scores '0.5' for game2 for jack and chloe
-			score_repo.save(new GameScore(game2, jack, (int) 0.5));
-			score_repo.save(new GameScore(game2, chloe, (int) 0.5));
+			score_repo.save(new GameScore(game2, jack, 0.5));
+			score_repo.save(new GameScore(game2, chloe, 0.5));
 
 			//create winning score for chloe in game3
 			score_repo.save(new GameScore(game3, chloe, 1));
@@ -145,11 +145,8 @@ public class Application {
 			score_repo.save(new GameScore(game3, tim, 0));
 
 			//create tie scores for jack and chloe in game4
-			score_repo.save(new GameScore(game4, jack, (int) 0.5));
-			score_repo.save(new GameScore(game4, chloe, (int) 0.5));
-
-
-
+			score_repo.save(new GameScore(game4, jack, 0.5));
+			score_repo.save(new GameScore(game4, chloe, 0.5));
 
 		};
 	}

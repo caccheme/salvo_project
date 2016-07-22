@@ -10,7 +10,7 @@ public class GameScore {
     @GeneratedValue(strategy= GenerationType.AUTO)
     private long id;
     private Date finishDate;
-    private int score;
+    private double score;
 
     //one player to many scores
     @ManyToOne(fetch = FetchType.EAGER)
@@ -24,7 +24,7 @@ public class GameScore {
 
     public GameScore() { finishDate = new Date(); }
 
-    public GameScore(Game game, Player player, int score) {
+    public GameScore(Game game, Player player, double score) {
         this.game = game;
         this.player = player;
         this.score = score;
