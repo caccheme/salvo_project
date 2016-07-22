@@ -26,7 +26,8 @@ public class Application {
 								  ShipRepository ship_repository,
 								  ShipLocationRepository sl_repository,
 								  SalvoRepository salvo_repository,
-								  SalvoLocationRepository salvo_loc_repo) {
+								  SalvoLocationRepository salvo_loc_repo,
+								  GameScoreRepository score_repo) {
 		return (args) -> {
 			// save a couple of players
 			Player jack = playerRepository.save(new Player("j.bauer@ctu.gov"));
@@ -126,6 +127,29 @@ public class Application {
 			//create salvo locations for Chloe(gp2) turn 1
 			salvo_loc_repo.save(new SalvoLocation(salvo3, "B4"));
 			salvo_loc_repo.save(new SalvoLocation(salvo3, "B5"));
+
+			//create winning '1' gameScore for jack in game1
+			score_repo.save(new GameScore(game1, jack, 1));
+
+			//create losing '0' gameScore for chloe in game1
+			score_repo.save(new GameScore(game1, chloe, 0));
+
+			//create tie scores '0.5' for game2 for jack and chloe
+			score_repo.save(new GameScore(game2, jack, (int) 0.5));
+			score_repo.save(new GameScore(game2, chloe, (int) 0.5));
+
+			//create winning score for chloe in game3
+			score_repo.save(new GameScore(game3, chloe, 1));
+
+			//create losing score for tim in game3
+			score_repo.save(new GameScore(game3, tim, 0));
+
+			//create tie scores for jack and chloe in game4
+			score_repo.save(new GameScore(game4, jack, (int) 0.5));
+			score_repo.save(new GameScore(game4, chloe, (int) 0.5));
+
+
+
 
 		};
 	}
