@@ -13,35 +13,14 @@ public class Player {
 	long id;
 	private String email;
 
-//	//commented out all firstName, lastName and Name code per Chris's update to player_id and player_email
-//	private String firstName;
-//	private String lastName;
-
 	@OneToMany(mappedBy="player", fetch=FetchType.EAGER)
 	Set<GamePlayer> games;
 
+	@OneToMany(mappedBy="player", fetch=FetchType.EAGER)
+	Set<GameScore> scores;
+
 	public Player() { }
 
-//	public String getFirstName() {
-//		return firstName;
-//	}
-//
-//	public void setFirstName(String _firstName) {
-//		firstName = _firstName;
-//	}
-//
-//	public String getLastName() {
-//		return lastName;
-//	}
-//
-//	public void setLastName(String _lastName) {
-//		lastName = _lastName;
-//	}
-//
-//	public Player(String _firstName, String _lastName) {
-//		firstName = _firstName;
-//		lastName = _lastName;
-//	}
 
 	public Player(String email) {
 		this.email = email;
@@ -60,16 +39,10 @@ public class Player {
 		return games;
 	}
 
-	@Override
-	public String toString() {
-		return String.format(
-			"Player[id=%d, email='%s']",
-			id, email);
+	@JsonIgnore
+	public Set<GameScore> getScores() {
+		return scores;
 	}
-
-//	public String getName() {
-//		return firstName + " " + lastName;
-//	}
 
 	public long getId() {
 		return id;

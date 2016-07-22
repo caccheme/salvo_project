@@ -17,6 +17,9 @@ public class Game {
     @OneToMany(mappedBy="game", fetch=FetchType.EAGER)
     Set<GamePlayer> players;
 
+    @OneToMany(mappedBy="game", fetch=FetchType.EAGER)
+    Set<GameScore> scores;
+
     public Game() {
         creationDate = new Date();
     }
@@ -34,20 +37,13 @@ public class Game {
         this.creationDate = date;
     }
 
-//    public Object getGame(Game game){ return game;}
-
-    @Override
-    public String toString() {
-        String result = String.format(
-                "Game [id=%d, date='%s']%n",
-                id, creationDate);
-        return result;
-    }
-
     @JsonIgnore
     public Set<GamePlayer> getPlayers() {
         return players;
     }
+
+    @JsonIgnore
+    public Set<GameScore> getScores() { return scores; }
 
     public long getId() {
         return id;
