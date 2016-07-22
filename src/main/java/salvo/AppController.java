@@ -144,6 +144,7 @@ public class AppController {
                 return ships.stream().map(s -> s.getShipLocations()).collect(Collectors.toList());
         }
 
+        //get games list info, including players and scores
         @RequestMapping("/games")
         public List<Object> getAllGames() {
                 return  repo
@@ -158,16 +159,33 @@ public class AppController {
 
                 dto.put("game_id", game.getId());
                 dto.put("date_created", game.getCreationDate());
-                dto.put("players", makePlayerList(game.getPlayers()));
+                dto.put("players", makePlayerDTO(game.getPlayers(), game.getScores()));
 
                 return dto;
         }
 
-        private List<Player> makePlayerList(Set<GamePlayer> gamePlayers) {
-                return gamePlayers
+        private Map<String, Object> makePlayerDTO(Set<GamePlayer> players, Set<GameScore> scores) {
+                Map<String, Object> dto = new LinkedHashMap<>();
+
+                dto.put("player", getPlayerEmails(players));
+                dto.put("score", getScoresArray(scores));
+
+                return  dto;
+        }
+
+        private List<String> getPlayerEmails(Set<GamePlayer> players){
+                return players
                         .stream()
-                        .map(gamePlayer -> gamePlayer.getPlayer())
-                        .sorted(Comparator.comparing(Player::getId))
+                        .sorted(Comparator.comparing(GamePlayer::getId))
+                        .map(p -> p.getPlayer().getEmail())
+                        .collect(Collectors.toList());
+        }
+
+        private List<Double> getScoresArray(Set<GameScore> scores) {
+                return scores
+                        .stream()
+                        .sorted(Comparator.comparing(GameScore::getId))
+                        .map(score -> score.getScore())
                         .collect(Collectors.toList());
         }
 
