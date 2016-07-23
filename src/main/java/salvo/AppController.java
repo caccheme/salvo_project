@@ -92,6 +92,30 @@ public class AppController {
                         .collect(Collectors.toList());
         }
 
+        //all scores for all gamePlayers
+        @RequestMapping("/scores")
+        public List<Object> getAllScores() {
+                return  gp_repository
+                        .findAll()
+                        .stream()
+                        .map(g -> makeScoresDTO(g))
+                        .collect(toList());
+        }
+
+        private Map<String, Object> makeScoresDTO(GamePlayer gamePlayer) {
+                Map<String, Object> dto = new LinkedHashMap<String, Object>();
+
+                dto.put("gamePlayer_id", gamePlayer.getId());
+                dto.put("gamePlayer_email", gamePlayer.getPlayer().getEmail());
+                dto.put("gamePlayer_scores", makeScoresListDTO(gamePlayer.getPlayer().getScores()));
+
+                return dto;
+        }
+
+        private List<Double> makeScoresListDTO(Set<GameScore> scores) {
+                return scores.stream().map(s -> s.getScore()).collect(Collectors.toList());
+        }
+
         @RequestMapping("/gpSalvoLocations/{gamePlayer_Id}")
         public Map<String, Object> makeGamePlayerSalvoLocationDTO(@PathVariable Long gamePlayer_Id) {
                 Map<String, Object> dto = new LinkedHashMap<>();
