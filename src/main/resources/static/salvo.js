@@ -18,7 +18,7 @@ $(document).ready(function(){
                                     + val.players.score[i] +'</li></ul>');
                 };
                 if (val.players.player[i] && val.players.score[i] === undefined){
-                    games.push('<ul><li>Player:    ' + val.players.player[i] + '    Score: N/A   </li></ul>');
+                    games.push('<ul><li>Player:    ' + val.players.player[i] + '    Score: N/A (Game still in play)   </li></ul>');
                 };
             };
       });

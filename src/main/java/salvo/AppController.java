@@ -72,6 +72,26 @@ public class AppController {
                         .collect(Collectors.toList());
         }
 
+        @RequestMapping("/gpScores/{gamePlayer_Id}")
+        public Map<String, Object> makeGamePlayerScoresDTO(@PathVariable Long gamePlayer_Id) {
+                Map<String, Object> dto = new LinkedHashMap<>();
+
+                //collect score data for one gamePlayer only
+                GamePlayer gamePlayer = gp_repository.findOne(gamePlayer_Id);
+                dto.put("player", gamePlayer.getPlayer().getEmail());
+                dto.put("scores", getPlayerScores(gamePlayer.getPlayer().getScores()));
+
+                return dto;
+        }
+
+        private List<Double> getPlayerScores(Set<GameScore> scores) {
+                return scores
+                        .stream()
+                        .sorted(Comparator.comparing(GameScore::getId))
+                        .map(s -> s.getScore())
+                        .collect(Collectors.toList());
+        }
+
         @RequestMapping("/gpSalvoLocations/{gamePlayer_Id}")
         public Map<String, Object> makeGamePlayerSalvoLocationDTO(@PathVariable Long gamePlayer_Id) {
                 Map<String, Object> dto = new LinkedHashMap<>();
