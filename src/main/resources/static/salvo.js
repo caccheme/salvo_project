@@ -12,10 +12,16 @@ $(document).ready(function(){
 
         games.push('<li id="' + key + '">Date Created:    ' + date +
         '</li>');
-        games.push('<ul><li>Player:    ' + val.players.player + '</li></ul>');
-        games.push('<ul><li>Score:    ' + val.players.score + '</li></ul>');
-
-        });
+            for (i=0; i < 2; i++) {
+                if (val.players.player[i] && val.players.score[i] || val.players.player[i] && val.players.score[i] == 0){
+                    games.push('<ul><li>Player:    ' + val.players.player[i] + '     Score:     '
+                                    + val.players.score[i] +'</li></ul>');
+                };
+                if (val.players.player[i] && val.players.score[i] === undefined){
+                    games.push('<ul><li>Player:    ' + val.players.player[i] + '    Score: N/A   </li></ul>');
+                };
+            };
+      });
 
       $('<ol/>', {
         html: games.join('')
