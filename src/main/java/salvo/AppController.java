@@ -78,7 +78,7 @@ public class AppController {
 
                 //collect score data for one gamePlayer only
                 GamePlayer gamePlayer = gp_repository.findOne(gamePlayer_Id);
-                dto.put("player", gamePlayer.getPlayer().getEmail());
+                dto.put("email", gamePlayer.getPlayer().getEmail());
                 dto.put("scores", getPlayerScores(gamePlayer.getPlayer().getScores()));
 
                 return dto;
@@ -105,9 +105,8 @@ public class AppController {
         private Map<String, Object> makeScoresDTO(GamePlayer gamePlayer) {
                 Map<String, Object> dto = new LinkedHashMap<String, Object>();
 
-                dto.put("gamePlayer_id", gamePlayer.getId());
-                dto.put("gamePlayer_email", gamePlayer.getPlayer().getEmail());
-                dto.put("gamePlayer_scores", makeScoresListDTO(gamePlayer.getPlayer().getScores()));
+                dto.put("email", gamePlayer.getPlayer().getEmail());
+                dto.put("scores", makeScoresListDTO(gamePlayer.getPlayer().getScores()));
 
                 return dto;
         }
