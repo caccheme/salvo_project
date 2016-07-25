@@ -9,8 +9,21 @@ $(document).ready(function(){
                 dataType: 'json',
                 success: function(scoreData, textStatus, jqXHR) {
                            leaderBoardCreate(scoreData);
+
                 }
           });//end ajax
+
+          $.ajax({
+                method: "get",
+                url: '/api/gpGames/'+ gamePlayer_Id,
+                dataType: 'json',
+                success: function(gameData, textStatus, jqXHR) {
+                         createGamesList(gameData);
+
+                }
+          });//end ajax
+
+
     }
     else {
      //get scores data for a specific gamePlayer_Id
@@ -22,6 +35,14 @@ $(document).ready(function(){
                         leaderBoardCreate(scoreData);
              }
         });//end ajax
+    }
+
+//still to do...create list of games for gamePlayer and the scores he/she got
+//right now just shows that the gameData object is being passed to the html
+    function createGamesList(gameData) {
+        var games = gameData;
+        document.getElementById("games_list").innerHTML = games;
+
     }
 
     //table or LeaderBoard for gamePlayer tallies

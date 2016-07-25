@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.RestController;
 import salvo.model.*;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
 
@@ -33,7 +32,7 @@ public class AppController {
 
         @RequestMapping("/gamePlayers")
         public List<GamePlayer> getAllGamePlayers(Map<String, Object> games) {
-                return gp_repository.findAll().stream().collect(Collectors.toList());
+                return gp_repository.findAll().stream().collect(toList());
 //                repo.findAll().stream().map(Game::getId).collect(Collectors.toList()); //to get list of id's
         }
 
@@ -61,7 +60,7 @@ public class AppController {
                         .stream()
                         .sorted(Comparator.comparing(Salvo::getId))
                         .map(s -> getCellList(s.getSalvoLocations()))
-                        .collect(Collectors.toList());
+                        .collect(toList());
         }
 
         private List<String> getCellList(Set<SalvoLocation> salvoLocations){
@@ -69,7 +68,7 @@ public class AppController {
                         .stream()
                         .sorted(Comparator.comparing(SalvoLocation::getId))
                         .map(sL -> sL.getSalvoLocationCell())
-                        .collect(Collectors.toList());
+                        .collect(toList());
         }
 
         @RequestMapping("/gpScores/{gamePlayer_Id}")
@@ -89,7 +88,7 @@ public class AppController {
                         .stream()
                         .sorted(Comparator.comparing(GameScore::getId))
                         .map(s -> s.getScore())
-                        .collect(Collectors.toList());
+                        .collect(toList());
         }
 
         //all scores for all gamePlayers
@@ -112,7 +111,7 @@ public class AppController {
         }
 
         private List<Double> makeScoresListDTO(Set<GameScore> scores) {
-                return scores.stream().map(s -> s.getScore()).collect(Collectors.toList());
+                return scores.stream().map(s -> s.getScore()).collect(toList());
         }
 
         @RequestMapping("/gpSalvoLocations/{gamePlayer_Id}")
@@ -129,14 +128,14 @@ public class AppController {
                 return salvoes
                         .stream()
                         .map(s -> makeSalvoLocationsList(s.getSalvoLocations()))
-                        .collect(Collectors.toList());
+                        .collect(toList());
         }
 
         private List<String> makeSalvoLocationsList(Set<SalvoLocation> salvoLocations) {
                 return salvoLocations
                         .stream()
                         .map(s -> s.getSalvoLocationCell())
-                        .collect(Collectors.toList());
+                        .collect(toList());
         }
 
         @RequestMapping("/gpShipLocations/{gamePlayer_Id}")
@@ -153,14 +152,14 @@ public class AppController {
                 return ships
                         .stream()
                         .map(ship -> makeShipLocationsList(ship.getShipLocations()))
-                        .collect(Collectors.toList());
+                        .collect(toList());
         }
 
         private List<String> makeShipLocationsList(Set<ShipLocation> shipLocations) {
                 return shipLocations
                         .stream()
                         .map(sL -> sL.getShipLocationCell())
-                        .collect(Collectors.toList());
+                        .collect(toList());
         }
 
 
@@ -184,7 +183,7 @@ public class AppController {
         }
 
         private List<Set<ShipLocation>> makeShipLocationsDTO(Set<Ship> ships) {
-                return ships.stream().map(s -> s.getShipLocations()).collect(Collectors.toList());
+                return ships.stream().map(s -> s.getShipLocations()).collect(toList());
         }
 
         //get games list info, including players and scores
@@ -221,7 +220,7 @@ public class AppController {
                         .stream()
                         .sorted(Comparator.comparing(GamePlayer::getId))
                         .map(p -> p.getPlayer().getEmail())
-                        .collect(Collectors.toList());
+                        .collect(toList());
         }
 
         private List<Double> getScoresArray(Set<GameScore> scores) {
@@ -229,7 +228,23 @@ public class AppController {
                         .stream()
                         .sorted(Comparator.comparing(GameScore::getId))
                         .map(score -> score.getScore())
-                        .collect(Collectors.toList());
+                        .collect(toList());
+        }
+
+        @RequestMapping("/gpGames/{gamePlayer_Id}")
+        public Map<String, Object> makeNewScoresDTO(@PathVariable Long gamePlayer_Id) {
+                Map<String, Object> dto = new LinkedHashMap<>();
+
+                //collect score data for one gamePlayer only
+                GamePlayer gamePlayer = gp_repository.findOne(gamePlayer_Id);
+
+                Set<GamePlayer> games = gamePlayer.getPlayer().getGames();
+                List<Set<GameScore>> scores = games.stream().map(g -> g.getGame().getScores()).collect(toList());
+
+                dto.put("email", gamePlayer.getPlayer().getEmail());
+                dto.put("scores", scores);
+
+                return dto;
         }
 
 }
