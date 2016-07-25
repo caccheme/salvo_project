@@ -19,10 +19,8 @@ $(document).ready(function(){
                 dataType: 'json',
                 success: function(gameData, textStatus, jqXHR) {
                          createGamesList(gameData);
-
                 }
           });//end ajax
-
 
     }
     else {
@@ -37,12 +35,51 @@ $(document).ready(function(){
         });//end ajax
     }
 
-//still to do...create list of games for gamePlayer and the scores he/she got
-//right now just shows that the gameData object is being passed to the html
+//create list of games for gamePlayer and the scores he/she got
     function createGamesList(gameData) {
-        var games = gameData;
-        document.getElementById("games_list").innerHTML = games;
+        var games = getGamesDatesForPlayer(gameData);
+        var scores = getScoresForGames(gameData);
+        var gLen = games.length;
+        var text = "<ul> <font size='5'>" + gameData.email + "'s Games and Scores:</font></br>";
+        var playerEmail = gameData.email
 
+        for (var i = 0; i < gLen; i++) {
+            text += "</br><li> Game Started on:  " + games[i] +
+                        "<ul><li>Player Game Score:   " + scores[i] + "</ul></li>" +
+                    "</li>";
+        }
+        text += "</ul>";
+        document.getElementById("games_list").innerHTML = text;
+
+    }
+
+    function getScoresForGames(gameData){
+        var result = [];
+        for (var k=0; k < gameData.scores.length; k++){
+                    if (gameData.scores[k].length == 2){ //make sure not empty object
+                        for (var l = 0; l < 2; l++){
+                            if (gameData.scores[k][l].player.email == gameData.email){ //get info for specific player
+                                result.push(gameData.scores[k][l].score);
+                            }
+                        }
+                    }
+                }
+        return result;
+    }
+
+    function getGamesDatesForPlayer(gameData){
+        var result = [];
+        for (var k=0; k < gameData.scores.length; k++){
+            if (gameData.scores[k].length == 2){ //make sure not empty object
+                for (var l = 0; l < 2; l++){
+                    if (gameData.scores[k][l].player.email == gameData.email){ //get info for specific player
+                        var date = new Date(gameData.scores[k][l].game.creationDate + 60*60*1000*k); //make each game hour apart
+                        result.push(date);
+                    }
+                }
+            }
+        }
+        return result;
     }
 
     //table or LeaderBoard for gamePlayer tallies
