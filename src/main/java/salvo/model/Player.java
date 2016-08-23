@@ -12,6 +12,7 @@ public class Player {
 	@GeneratedValue(strategy=GenerationType.AUTO)
 	long id;
 	private String email;
+	private String password;
 
 	@OneToMany(mappedBy="player", fetch=FetchType.EAGER)
 	Set<GamePlayer> games;
@@ -22,8 +23,9 @@ public class Player {
 	public Player() { }
 
 
-	public Player(String email) {
+	public Player(String email, String password) {
 		this.email = email;
+		this.password = password;
 	}
 
 	public String getEmail() {
@@ -33,6 +35,10 @@ public class Player {
 	public void setEmail(String email) {
 		this.email = email;
 	}
+
+	public String getPassword() {return password;}
+
+	public void setPassword(String password) {this.password = password; }
 
 	@JsonIgnore
 	public Set<GamePlayer> getGames() {
