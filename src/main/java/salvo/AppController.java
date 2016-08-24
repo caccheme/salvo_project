@@ -36,6 +36,11 @@ public class AppController {
 //                repo.findAll().stream().map(Game::getId).collect(Collectors.toList()); //to get list of id's
         }
 
+//        @RequestMapping("/salvoes")
+//        public List<Object> getThemNow() {
+//                return gp_repository.findAll().stream().map(g -> g.getSalvoes()).collect(Collectors.toList());
+//        }
+
         @RequestMapping("/salvoes")
         public List<Object> getAllSalvoes() {
                 return  gp_repository

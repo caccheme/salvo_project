@@ -23,7 +23,9 @@ $(document).ready(function(){
           success: function(salvo, textStatus, jqXHR) {
                      tableCreate2(salvo);
                      getShipHits(salvo);
-//
+                     console.log(salvo);
+                  console.log(salvo[0][0].salvoLocations[0].salvoLocationCell);
+                  console.log(salvo[0][0]);
           }
     });//end ajax
 
@@ -219,9 +221,6 @@ $(document).ready(function(){
                  }
                  else if (i > 0 && j > 0) {
                      var td = document.createElement('td');
-                     //loop through game data and fill in grid where ships are ... still to do
-                     //the param obj search should give the gp id value and can use it in this loop
-
 
                     // create string values based on table position
                     var jArray = [" ", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J"]; //so jArray[1] should = "A", etc
@@ -250,6 +249,11 @@ $(document).ready(function(){
      }
 
       function getGamePlayerSalvoData(data){
+//        salvoData = data[0][0].salvoLocations[i].salvoLocationCell;
+//        salvoData = [];
+//
+////                          console.log(salvo[0][0].salvoLocations[0].salvoLocationCell);
+////                          console.log(salvo[0][0]);
         var result = ""
         for (var i = 0; i < data.length; i++) {
            if (data[i].gamePlayer_id == gamePlayer_Id) {
