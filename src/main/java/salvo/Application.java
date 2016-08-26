@@ -1,13 +1,29 @@
 package salvo;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.web.SpringBootServletInitializer;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.authentication.configurers.GlobalAuthenticationConfigurerAdapter;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.core.authority.AuthorityUtils;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import salvo.model.*;
 
+import java.util.List;
+
+
 @SpringBootApplication
-public class Application {
+public class Application extends SpringBootServletInitializer{
 
 	//	private Player jack, chloe, kim, david, michelle;
 	private Game game1, game2, game3, game4, game5, game6;
@@ -161,3 +177,46 @@ public class Application {
 	}
 
 }
+
+@Configuration
+class WebSecurityConfiguration extends GlobalAuthenticationConfigurerAdapter {
+
+	@Autowired
+	PlayerRepository playerRepository;
+
+	@Override
+	public void init(AuthenticationManagerBuilder auth) throws Exception {
+		auth.userDetailsService(userDetailsService());
+	}
+
+	@Bean
+	UserDetailsService userDetailsService() {
+		return new UserDetailsService() {
+
+			@Override
+			public UserDetails loadUserByUsername(String name) throws UsernameNotFoundException {
+				List<Player> people = playerRepository.findByEmail(name);
+				if (!people.isEmpty()) {
+					Player person = people.get(0);
+					return new User(person.getEmail(), person.getPassword(), AuthorityUtils.createAuthorityList("USER"));
+				} else {
+					throw new UsernameNotFoundException("Unknown user: " + name);
+				}
+			}
+		};
+	}
+}
+
+@Configuration
+@EnableWebSecurity
+class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+	@Override
+	protected void configure(HttpSecurity http) throws Exception {
+		http.authorizeRequests()
+				.antMatchers("/admin/**").hasAuthority("ADMIN")
+				.antMatchers("/**").hasAuthority("USER")
+				.and()
+				.formLogin();
+	}
+}
+
