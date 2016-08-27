@@ -207,6 +207,17 @@ class WebSecurityConfiguration extends GlobalAuthenticationConfigurerAdapter {
 	}
 }
 
+//	Modify the rules in your WebSecurityConfigurerAdapter (below) so that
+//
+//	If you are not logged in, you can only access the games main page.
+//		You will need to allow access not only to the HTML page, but every URL that page needs, e.g.,
+//		links to CSS, JavaScript, or image files
+//		URLs used in AJAX calls
+//		If you are logged in, you can see
+//		the manager.html page (see next subtask) and every URL it needs
+//		the game.html?gp=nn page and every URL it needs
+
+
 @Configuration
 @EnableWebSecurity
 class WebSecurityConfig extends WebSecurityConfigurerAdapter {

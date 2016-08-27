@@ -1,11 +1,14 @@
 package salvo;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import salvo.model.*;
 
+import java.net.URI;
 import java.util.*;
 
 import static java.util.stream.Collectors.toList;
@@ -22,6 +25,8 @@ public class AppController {
         private GameRepository repo;
         @Autowired
         private GamePlayerRepository gp_repository;
+        @Autowired
+        private PlayerRepository playerRepository;
 
 //works to get game objects list without player info attached
 //        @RequestMapping("/games")
@@ -252,4 +257,50 @@ public class AppController {
                 return dto;
         }
 
+//        example code modified for my use to return a JSON object and not use headers
+//        @RequestMapping(path = "/users", method = RequestMethod.POST)
+//        public ResponseEntity<Object> createUser(@RequestParam String name, String password) {
+//                if (name.isEmpty()) {
+//                        return new ResponseEntity<>(makeMap("error", "No name"), HttpStatus.FORBIDDEN);
+//                }
+//                if (password.isEmpty()){
+//                        return new ResponseEntity<>(makeMap("error", "No password"), HttpStatus.FORBIDDEN);
+//                }
+//                Player user = (Player) playerRepository.findByEmail(name);
+//                if (user != null) {
+//                        return new ResponseEntity<>(makeMap("error", "No such user"), HttpStatus.CONFLICT);
+//                }
+//                user = playerRepository.save(new Player(name, password));
+//                return new ResponseEntity<>(makeMap("id", user.getId()), HttpStatus.CREATED);
+//        }
+//
+//        private Map<String, Object> makeMap(String key, Object value) {
+//                Map<String, Object> map = new HashMap<>();
+//                map.put(key, value);
+//                return map;
+//        }
+
+        @RequestMapping(path = "/users", method = RequestMethod.POST)
+        public ResponseEntity<String> createUser(@RequestParam String name, String password) {
+                if (name.isEmpty()) {
+                        return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+                }
+                if (password.isEmpty()){
+                        return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+                }
+                Player user = (Player) playerRepository.findByEmail(name);
+                if (user != null) {
+                        return new ResponseEntity<>(HttpStatus.CONFLICT);
+                }
+
+                playerRepository.save(new Player(name, password));
+                URI location = ServletUriComponentsBuilder
+                        .fromCurrentContextPath()
+                        .path("/users/{id}")
+                        .buildAndExpand(user.getId())
+                        .toUri();
+                HttpHeaders responseHeaders = new HttpHeaders();
+                responseHeaders.setLocation(location);;
+                return new ResponseEntity<>(responseHeaders, HttpStatus.CREATED);
+        }
 }
