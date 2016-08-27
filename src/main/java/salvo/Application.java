@@ -207,16 +207,6 @@ class WebSecurityConfiguration extends GlobalAuthenticationConfigurerAdapter {
 	}
 }
 
-//	Modify the rules in your WebSecurityConfigurerAdapter (below) so that
-//
-//	If you are not logged in, you can only access the games main page.
-//		You will need to allow access not only to the HTML page, but every URL that page needs, e.g.,
-//		links to CSS, JavaScript, or image files
-//		URLs used in AJAX calls
-//		If you are logged in, you can see
-//		the manager.html page (see next subtask) and every URL it needs
-//		the game.html?gp=nn page and every URL it needs
-
 
 @Configuration
 @EnableWebSecurity
@@ -224,10 +214,16 @@ class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 		http.authorizeRequests()
-				.antMatchers("/admin/**").hasAuthority("ADMIN")
-				.antMatchers("/**").hasAuthority("USER")
+					//allow access to games.html when not logged in
+				.antMatchers("/games.html","/api/games", "/js/salvo.js").permitAll()
+				.antMatchers("/admin/**").hasRole("ADMIN")
+					//allow access after logged in:
+				.antMatchers("/manager.html").hasAuthority("USER") //need to create manager.html and add URLs the manager page needs
+				.antMatchers("/game.html?gp=**", "/js/shipGrid.js",
+						"/api/gpShipLocations/", "/api/salvoes",
+						"api/gamePlayers/").hasAuthority("USER")
+				.anyRequest().authenticated()
 				.and()
-				.formLogin();
+			.formLogin();
 	}
 }
-
