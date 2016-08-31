@@ -1,14 +1,11 @@
 package salvo;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import salvo.model.*;
 
-import java.net.URI;
 import java.util.*;
 
 import static java.util.stream.Collectors.toList;
@@ -280,27 +277,27 @@ public class AppController {
 //                return map;
 //        }
 
-        @RequestMapping(path = "/users", method = RequestMethod.POST)
-        public ResponseEntity<String> createUser(@RequestParam String name, String password) {
-                if (name.isEmpty()) {
-                        return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-                }
-                if (password.isEmpty()){
-                        return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-                }
-                Player user = (Player) playerRepository.findByEmail(name);
-                if (user != null) {
-                        return new ResponseEntity<>(HttpStatus.CONFLICT);
-                }
 
-                playerRepository.save(new Player(name, password));
-                URI location = ServletUriComponentsBuilder
-                        .fromCurrentContextPath()
-                        .path("/users/{id}")
-                        .buildAndExpand(user.getId())
-                        .toUri();
-                HttpHeaders responseHeaders = new HttpHeaders();
-                responseHeaders.setLocation(location);;
-                return new ResponseEntity<>(responseHeaders, HttpStatus.CREATED);
+//    need to update the code below to check that the game player referenced by the ID nn is in fact the current user
+//    and send an UNAUTHORIZED response if this is not true
+
+        //get the logged in user, get the GamePlayer with the ID in the /rest URL, and see if they're consistent
+        @RequestMapping(path = "/game.html?gp={gamePlayerId}", method = RequestMethod.POST)
+                //gamePlayerId should come from URL, name should come from Player info
+        public ResponseEntity<String> checkUser(@RequestParam long gamePlayerId) {
+                //get the logged in user:
+//                String name = Player.
+                //get gamePlayer record from ID of URL
+                GamePlayer gamePlayer = gp_repository.findOne(gamePlayerId);
+                        //get player_id from the URL gamePlayer record
+                long player_id = gamePlayer.getPlayer().getId();
+                        //get player name from the URL gamePlayer record
+                String player_name = playerRepository.findOne(player_id).getEmail();
+                        //check that player name from URL record matches the player name of the user with acces to URL
+                if (player_name == name) {
+                        return new ResponseEntity<>(HttpStatus.ACCEPTED);
+                }
+                return null;
         }
+
 }
