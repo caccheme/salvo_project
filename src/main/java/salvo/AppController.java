@@ -3,6 +3,10 @@ package salvo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import salvo.model.*;
 
@@ -254,50 +258,47 @@ public class AppController {
                 return dto;
         }
 
-//        example code modified for my use to return a JSON object and not use headers
-//        @RequestMapping(path = "/users", method = RequestMethod.POST)
-//        public ResponseEntity<Object> createUser(@RequestParam String name, String password) {
-//                if (name.isEmpty()) {
-//                        return new ResponseEntity<>(makeMap("error", "No name"), HttpStatus.FORBIDDEN);
-//                }
-//                if (password.isEmpty()){
-//                        return new ResponseEntity<>(makeMap("error", "No password"), HttpStatus.FORBIDDEN);
-//                }
-//                Player user = (Player) playerRepository.findByEmail(name);
-//                if (user != null) {
-//                        return new ResponseEntity<>(makeMap("error", "No such user"), HttpStatus.CONFLICT);
-//                }
-//                user = playerRepository.save(new Player(name, password));
-//                return new ResponseEntity<>(makeMap("id", user.getId()), HttpStatus.CREATED);
-//        }
-//
-//        private Map<String, Object> makeMap(String key, Object value) {
-//                Map<String, Object> map = new HashMap<>();
-//                map.put(key, value);
-//                return map;
-//        }
-
-
-//    need to update the code below to check that the game player referenced by the ID nn is in fact the current user
-//    and send an UNAUTHORIZED response if this is not true
-
         //get the logged in user, get the GamePlayer with the ID in the /rest URL, and see if they're consistent
         @RequestMapping(path = "/game.html?gp={gamePlayerId}", method = RequestMethod.POST)
-                //gamePlayerId should come from URL, name should come from Player info
-        public ResponseEntity<String> checkUser(@RequestParam long gamePlayerId) {
-                //get the logged in user:
-//                String name = Player.
+        //gamePlayerId should come from URL, name should come from Player info
+        public ResponseEntity<Map<String, Object>> checkUser(@RequestParam long gamePlayerId) {
                 //get gamePlayer record from ID of URL
                 GamePlayer gamePlayer = gp_repository.findOne(gamePlayerId);
-                        //get player_id from the URL gamePlayer record
-                long player_id = gamePlayer.getPlayer().getId();
-                        //get player name from the URL gamePlayer record
-                String player_name = playerRepository.findOne(player_id).getEmail();
-                        //check that player name from URL record matches the player name of the user with acces to URL
-                if (player_name == name) {
-                        return new ResponseEntity<>(HttpStatus.ACCEPTED);
+                String player_name = gamePlayer.getPlayer().getEmail();
+                if (player_name != getCurrentUsername()) {
+                        return makeResponse(null, HttpStatus.UNAUTHORIZED);
                 }
-                return null;
+                else {
+                        Map<String, Object> dto = new LinkedHashMap<String, Object>();
+                        return makeResponse(makeAccountDTO(gamePlayer), HttpStatus.OK);
+                }
+        }
+
+//        function to make a ResponseEntity with a Map<String, Object>
+        private ResponseEntity<Map<String, Object>> makeResponse (Map<String, Object> dto, HttpStatus status){
+
+
+                return null; //placeholder for now...not sure what this will give....
+        }
+
+        private Map<String, Object> makeAccountDTO(GamePlayer user){
+                Map<String, Object> dto = new LinkedHashMap<>();
+
+                dto.put("user_name", user.getPlayer().getEmail());
+                dto.put("user_password", user.getPlayer().getPassword());
+
+                return  dto;
+        }
+
+        private String getCurrentUsername() {
+                Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+                if (auth == null || !auth.isAuthenticated() || auth instanceof AnonymousAuthenticationToken) {
+                        return null;
+                } else {
+                        Object principal = auth.getPrincipal();
+                        return (principal instanceof UserDetails) ? ((UserDetails) principal).getUsername() : principal.toString();
+                }
         }
 
 }
+

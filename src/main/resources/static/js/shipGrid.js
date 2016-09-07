@@ -1,5 +1,6 @@
 $(document).ready(function(){
 
+//see if user can see this page....
     var gamePlayer_Id = getParameterByName('gp');
 
 //get shipLocation data for a specific gamePlayer_Id

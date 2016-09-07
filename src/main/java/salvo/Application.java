@@ -208,21 +208,24 @@ class WebSecurityConfiguration extends GlobalAuthenticationConfigurerAdapter {
 }
 
 
+
 @Configuration
 @EnableWebSecurity
 class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 		http.authorizeRequests()
-					//allow access to games.html when not logged in
-				.antMatchers("/index.html","/games.html","/api/games", "/js/salvo.js").permitAll()
+					//allow access to index.html and games.html when not logged in
+				.antMatchers("/", "/js/app.js", "/index.html",
+						"/games.html","/api/games", "/js/salvo.js").permitAll()
 					//allow access after logged in:
-				.antMatchers("/manager.html").hasAuthority("USER") //need to create manager.html and add URLs the manager page needs
-				.antMatchers("/game.html?gp=nn", "/js/shipGrid.js",
-						"/api/gpShipLocations/", "/api/salvoes",
-						"api/gamePlayers/").hasAuthority("USER")
+//				.antMatchers("/manager.html", //need to create manager.html and add URLs the manager page needs
+//						"/api/game.html?gp=nn", "/js/shipGrid.js",  // should use /api/game... or just /game.html??
+//						"/api/gpShipLocations/", "/api/salvoes",
+//						"api/gamePlayers/").hasAuthority("USER")
 				.anyRequest().authenticated()
 				.and()
 			.formLogin();
+//		checkUser() method call here?
 	}
 }
