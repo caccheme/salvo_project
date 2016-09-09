@@ -202,11 +202,14 @@ public class AppController {
         public Map<String, Object> getGames() {
                 Map<String, Object> dto = new LinkedHashMap<>();
 
-// currently the commented out code causes an error: Internal Server Error (Status of 500)
-//                Player currentPlayer = (Player) playerRepository.findByEmail(getCurrentUsername());
-//                Long currentId = currentPlayer.getId();
-//
-//                dto.put("player", getCurrentPlayer(playerRepository.findOne(currentId)));
+                String name = getCurrentUsername();
+
+                if (name != null) {
+                        Player currentPlayer = playerRepository.findOneByEmail(getCurrentUsername());
+                        Long currentId = currentPlayer.getId();
+
+                        dto.put("player", getCurrentPlayer(playerRepository.findOne(currentId)));
+                }
                 dto.put("games", getAllGames());
                 return dto;
         }
@@ -214,13 +217,15 @@ public class AppController {
         private Map<String, Object> getCurrentPlayer(Player player) {
                 Map<String, Object> dto = new LinkedHashMap<>();
 
+//                if player = null
+
                 dto.put("id", player.getId());
                 dto.put("name", player.getEmail());
 
                 return dto;
         }
 
-        public List<Object> getAllGames() {
+        private List<Object> getAllGames() {
                 return  repo
                         .findAll()
                         .stream()

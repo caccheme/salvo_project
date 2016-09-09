@@ -19,8 +19,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import salvo.model.*;
 
-import java.util.List;
-
 
 @SpringBootApplication
 public class Application extends SpringBootServletInitializer{
@@ -195,9 +193,9 @@ class WebSecurityConfiguration extends GlobalAuthenticationConfigurerAdapter {
 
 			@Override
 			public UserDetails loadUserByUsername(String name) throws UsernameNotFoundException {
-				List<Player> people = playerRepository.findByEmail(name);
-				if (!people.isEmpty()) {
-					Player person = people.get(0);
+				Player person = playerRepository.findOneByEmail(name);
+				if (person != null) {
+
 					return new User(person.getEmail(), person.getPassword(), AuthorityUtils.createAuthorityList("USER"));
 				} else {
 					throw new UsernameNotFoundException("Unknown user: " + name);
