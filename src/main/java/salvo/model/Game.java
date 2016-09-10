@@ -1,7 +1,5 @@
 package salvo.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import javax.persistence.*;
 import java.util.Date;
 import java.util.Set;
@@ -37,12 +35,10 @@ public class Game {
         this.creationDate = date;
     }
 
-    @JsonIgnore
     public Set<GamePlayer> getPlayers() {
         return players;
     }
 
-    @JsonIgnore
     public Set<GameScore> getScores() { return scores; }
 
     public long getId() {

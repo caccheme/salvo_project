@@ -1,7 +1,5 @@
 package salvo.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import javax.persistence.*;
 import java.util.Set;
 
@@ -40,12 +38,10 @@ public class Player {
 
 	public void setPassword(String password) {this.password = password; }
 
-	@JsonIgnore
 	public Set<GamePlayer> getGames() {
 		return games;
 	}
 
-	@JsonIgnore
 	public Set<GameScore> getScores() {
 		return scores;
 	}

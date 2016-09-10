@@ -15,7 +15,6 @@ $(document).ready(function(){
         }
   });//end ajax
 
-
   //get salvoLocation data tied to gamePlayers and games
     $.ajax({
           method: "get",
@@ -24,9 +23,6 @@ $(document).ready(function(){
           success: function(salvo, textStatus, jqXHR) {
                      tableCreate2(salvo);
                      getShipHits(salvo);
-                     console.log(salvo);
-                  console.log(salvo[0][0].salvoLocations[0].salvoLocationCell);
-                  console.log(salvo[0][0]);
           }
     });//end ajax
 
@@ -39,26 +35,15 @@ $(document).ready(function(){
 // get gamePlayer data
     $.ajax({
             method: "get",
-            url: '/api/gamePlayers/',
+            url: '/api/gamePlayer/'+ gamePlayer_Id,
             dataType: 'json',
-            success: function(gamePlayers, textStatus, jqXHR) {
-                getPlayerEmail(gamePlayers);
+            success: function(gamePlayer, textStatus, jqXHR) {
+                showPlayerEmail(gamePlayer);
             }
     });//end ajax
 
-// gamePlayer id is the position in the gamePlayers data array, so gamePlayer id = 1 is gamePlayers[0] object
-// get gamePlayer email from gamePlayers object
-    function getPlayerEmail(gamePlayers) {
-        var result = ""
-            if (gamePlayers[gamePlayer_Id-1].player.id) {
-                result = gamePlayers[gamePlayer_Id-1].player.email;
-            }
-        emailShow("Welcome, "+ result + "!");
-    }
-
-// show email/name of player on web view
-    function emailShow(string) {
-        $("#player_email").text(string);
+    function showPlayerEmail(gamePlayer) {
+        $("#player_email").text("Welcome, "+ gamePlayer.gamePlayer_name + "!");
     }
 
      function tableCreate1(data) {

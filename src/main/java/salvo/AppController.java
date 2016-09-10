@@ -29,23 +29,15 @@ public class AppController {
         @Autowired
         private PlayerRepository playerRepository;
 
-//works to get game objects list without player info attached
-//        @RequestMapping("/games")
-//        public List<Game> getAllGames(Map<String, Object> games) {
-//                return repo.findAll().stream().collect(Collectors.toList());
-////                repo.findAll().stream().map(Game::getId).collect(Collectors.toList()); //to get list of id's
-//        }
+        @RequestMapping("/gamePlayer/{gamePlayer_Id}")
+        public Map<String, Object> makeGamePlayerDTO(@PathVariable Long gamePlayer_Id) {
+                Map<String, Object> dto = new LinkedHashMap<String, Object>();
 
-        @RequestMapping("/gamePlayers")
-        public List<GamePlayer> getAllGamePlayers(Map<String, Object> games) {
-                return gp_repository.findAll().stream().collect(toList());
-//                repo.findAll().stream().map(Game::getId).collect(Collectors.toList()); //to get list of id's
+                GamePlayer gamePlayer = gp_repository.findOne(gamePlayer_Id);
+                dto.put("gamePlayer_name", gamePlayer.getPlayer().getEmail());
+
+                return dto;
         }
-
-//        @RequestMapping("/salvoes")
-//        public List<Object> getThemNow() {
-//                return gp_repository.findAll().stream().map(g -> g.getSalvoes()).collect(Collectors.toList());
-//        }
 
         @RequestMapping("/salvoes")
         public List<Object> getAllSalvoes() {
@@ -217,8 +209,6 @@ public class AppController {
         private Map<String, Object> getCurrentPlayer(Player player) {
                 Map<String, Object> dto = new LinkedHashMap<>();
 
-//                if player = null
-
                 dto.put("id", player.getId());
                 dto.put("name", player.getEmail());
 
@@ -271,7 +261,8 @@ public class AppController {
         @RequestMapping("/gpGames/{gamePlayer_Id}")
         public Map<String, Object> makeNewScoresDTO(@PathVariable Long gamePlayer_Id) {
                 Map<String, Object> dto = new LinkedHashMap<>();
-
+//let's get the user and if there isn't one: can't see this
+//then check that user can only see their own game page (is the gamePlayer player the same as the currentUser logged in?)
                 //collect score data for one gamePlayer only
                 GamePlayer gamePlayer = gp_repository.findOne(gamePlayer_Id);
 
@@ -284,8 +275,9 @@ public class AppController {
                 return dto;
         }
 
+        //superfluous...see above
         //get the logged in user, get the GamePlayer with the ID in the /rest URL, and see if they're consistent
-        @RequestMapping(path = "/game.html?gp={gamePlayerId}", method = RequestMethod.POST)
+        @RequestMapping(path = "/game/{gamePlayerId}", method = RequestMethod.POST)
         //gamePlayerId should come from URL, name should come from Player info
         public ResponseEntity<Map<String, Object>> checkUser(@RequestParam long gamePlayerId) {
                 //get gamePlayer record from ID of URL

@@ -214,7 +214,7 @@ class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	protected void configure(HttpSecurity http) throws Exception {
 		http.authorizeRequests()
 					//allow access to index.html and games.html when not logged in
-				.antMatchers("/", "/js/app.js", "/index.html",
+				.antMatchers("/js/app.js", "/index.html","/css/app.css" ,
 						"/games.html","/api/games", "/js/salvo.js").permitAll()
 					//allow access after logged in:
 //				.antMatchers("/manager.html", //need to create manager.html and add URLs the manager page needs
