@@ -23,6 +23,7 @@ $(document).ready(function(){
           success: function(salvo, textStatus, jqXHR) {
                      tableCreate2(salvo);
                      getShipHits(salvo);
+                     console.log(salvo);
           }
     });//end ajax
 
