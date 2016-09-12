@@ -28,7 +28,6 @@ public class Application extends SpringBootServletInitializer{
 	//	private Player jack, chloe, kim, david, michelle;
 	private Game game1, game2, game3, game4, game5, game6;
 	private GamePlayer gp1, gp2, gp3;
-	private Salvo salvo1, salvo2, salvo3, salvo4;
 
 	public static void main(String[] args) {
 		SpringApplication.run(Application.class);
@@ -40,7 +39,6 @@ public class Application extends SpringBootServletInitializer{
 								  GamePlayerRepository gp_repository,
 								  ShipRepository ship_repository,
 								  SalvoRepository salvo_repository,
-								  SalvoLocationRepository salvo_loc_repo,
 								  GameScoreRepository score_repo) {
 		return (args) -> {
 			// save a couple of players
@@ -96,32 +94,10 @@ public class Application extends SpringBootServletInitializer{
 			ship_repository.save(new Ship("cruiser", gp3, Arrays.asList("B5", "C5", "D5")));
 
 			//create salvo for Jack(gp1) and Chloe(gp2) turn 1 & 2 of game1
-			salvo1 = salvo_repository.save(new Salvo(gp1, 1));
-			salvo2 = salvo_repository.save(new Salvo(gp1, 2));
-			salvo3 = salvo_repository.save(new Salvo(gp2, 1));
-			salvo4 = salvo_repository.save(new Salvo(gp2, 2));
-
-//game1
-			//create salvo locations for Jack(gp1) turn 1
-			salvo_loc_repo.save(new SalvoLocation(salvo1, "B5"));
-			salvo_loc_repo.save(new SalvoLocation(salvo1, "C5"));
-			salvo_loc_repo.save(new SalvoLocation(salvo1, "F1"));
-
-			//create salvo locations for Jack(gp1) turn 2
-			salvo_loc_repo.save(new SalvoLocation(salvo2, "F2"));
-			salvo_loc_repo.save(new SalvoLocation(salvo2, "D5"));
-
-			//create salvo locations for Chloe(gp2) turn 1
-			salvo_loc_repo.save(new SalvoLocation(salvo3, "B4"));
-			salvo_loc_repo.save(new SalvoLocation(salvo3, "B5"));
-			salvo_loc_repo.save(new SalvoLocation(salvo3, "B6"));
-
-			//create salvo locations fo Chloe(gp2) turn2
-			salvo_loc_repo.save(new SalvoLocation(salvo4, "E1"));
-			salvo_loc_repo.save(new SalvoLocation(salvo4, "H3"));
-			salvo_loc_repo.save(new SalvoLocation(salvo4, "A2"));
-
-
+			salvo_repository.save(new Salvo(gp1, 1, Arrays.asList("B5", "C5", "F1")));
+			salvo_repository.save(new Salvo(gp1, 2, Arrays.asList("F2", "D5")));
+			salvo_repository.save(new Salvo(gp2, 1, Arrays.asList("B4", "B5", "B6")));
+			salvo_repository.save(new Salvo(gp2, 2, Arrays.asList("E1", "H3", "A2")));
 
 			//create winning '1' gameScore for jack in game1
 			score_repo.save(new GameScore(game1, jack, 1));
@@ -188,14 +164,8 @@ class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 					//allow access to index.html and games.html when not logged in
 				.antMatchers("/js/app.js", "/index.html","/css/app.css" ,
 						"/games.html","/api/games", "/js/salvo.js").permitAll()
-					//allow access after logged in:
-//				.antMatchers("/manager.html", //need to create manager.html and add URLs the manager page needs
-//						"/api/game.html?gp=nn", "/js/shipGrid.js",  // should use /api/game... or just /game.html??
-//						"/api/gpShipLocations/", "/api/salvoes",
-//						"api/gamePlayers/").hasAuthority("USER")
 				.anyRequest().authenticated()
 				.and()
 			.formLogin();
-//		checkUser() method call here?
 	}
 }

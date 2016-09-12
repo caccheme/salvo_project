@@ -183,16 +183,7 @@ public class AppController {
         private List<List<String>> makeLocationList(Set<Salvo> salvoes) {
                 return salvoes
                         .stream()
-                        .sorted(Comparator.comparing(Salvo::getId))
-                        .map(s -> getCellList(s.getSalvoLocations()))
-                        .collect(toList());
-        }
-
-        private List<String> getCellList(Set<SalvoLocation> salvoLocations){
-                return salvoLocations
-                        .stream()
-                        .sorted(Comparator.comparing(SalvoLocation::getId))
-                        .map(sL -> sL.getSalvoLocationCell())
+                        .map(s -> s.getSalvoLocations() )
                         .collect(toList());
         }
 
@@ -221,17 +212,9 @@ public class AppController {
         private List<List<String>> getSalvoLocations(Set<Salvo> salvoes) {
                 return salvoes
                         .stream()
-                        .map(s -> makeSalvoLocationsList(s.getSalvoLocations()))
+                        .map(s -> s.getSalvoLocations())
                         .collect(toList());
         }
-
-        private List<String> makeSalvoLocationsList(Set<SalvoLocation> salvoLocations) {
-                return salvoLocations
-                        .stream()
-                        .map(s -> s.getSalvoLocationCell())
-                        .collect(toList());
-        }
-
 
         private List<List<String>> getShipLocations(Set<Ship> ships) {
                 return ships
@@ -239,13 +222,6 @@ public class AppController {
                         .map(ship -> ship.getShipLocations())
                         .collect(toList());
         }
-
-//        private List<String> makeShipLocationsList(List<String> shipLocations) {
-//                return shipLocations
-//                        .stream()
-//                        .map(sL -> sL.getShipLocationCell())
-//                        .collect(toList());
-//        }
 
         private Map<String, Object> makeShipDTO(GamePlayer gamePlayer) {
                 Map<String, Object> dto = new LinkedHashMap<String, Object>();

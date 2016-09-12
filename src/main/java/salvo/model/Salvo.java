@@ -1,7 +1,8 @@
 package salvo.model;
 
 import javax.persistence.*;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 public class Salvo {
@@ -14,14 +15,18 @@ public class Salvo {
     @JoinColumn(name="gamePlayer_id")
     private GamePlayer gamePlayer;
 
-    @OneToMany(mappedBy="salvo", fetch=FetchType.EAGER)
-    Set<SalvoLocation> salvoLocations;
+//    @OneToMany(mappedBy="salvo", fetch=FetchType.EAGER)
+//    Set<SalvoLocation> salvoLocations;
+    @ElementCollection
+    @Column(name="salvoLocations")
+    private List<String> salvoLocations = new ArrayList<>();
 
     public Salvo() {}
 
-    public Salvo(GamePlayer gamePlayer, int turn) {
+    public Salvo(GamePlayer gamePlayer, int turn, List<String> salvoLocations) {
         this.gamePlayer = gamePlayer;
         this.turn = turn;
+        this.salvoLocations = salvoLocations;
     }
 
     public int getTurn() {
@@ -48,7 +53,7 @@ public class Salvo {
         this.gamePlayer = gamePlayer;
     }
 
-    public Set<SalvoLocation> getSalvoLocations() {
+    public List<String> getSalvoLocations() {
         return salvoLocations;
     }
 }
