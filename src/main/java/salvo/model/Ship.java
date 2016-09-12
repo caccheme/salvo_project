@@ -1,7 +1,8 @@
 package salvo.model;
 
 import javax.persistence.*;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 public class Ship {
@@ -10,8 +11,9 @@ public class Ship {
     long id;
     private String shipType;
 
-    @OneToMany(mappedBy="ship", fetch=FetchType.EAGER)
-    Set<ShipLocation> shipLocations;
+    @ElementCollection
+    @Column(name="shipLocations")
+    private List<String> shipLocations = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name="gamePlayer_id")
@@ -19,9 +21,10 @@ public class Ship {
 
     public Ship() { }
 
-    public Ship(String shipType, GamePlayer gamePlayer) {
+    public Ship(String shipType, GamePlayer gamePlayer, List<String> shipLocations) {
         this.shipType = shipType;
         this.gamePlayer = gamePlayer;
+        this.shipLocations = shipLocations;
     }
 
     public String getShipType() {
@@ -40,7 +43,7 @@ public class Ship {
         this.id = id;
     }
 
-    public Set<ShipLocation> getShipLocations() {
+    public List<String> getShipLocations() {
         return shipLocations;
     }
 

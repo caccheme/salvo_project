@@ -19,14 +19,15 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import salvo.model.*;
 
+import java.util.Arrays;
+
 
 @SpringBootApplication
 public class Application extends SpringBootServletInitializer{
 
 	//	private Player jack, chloe, kim, david, michelle;
 	private Game game1, game2, game3, game4, game5, game6;
-	private GamePlayer gp1, gp2, gp3, gp4, gp5;
-	private Ship ship1, ship2, ship3, ship4, ship5, ship6, ship7;
+	private GamePlayer gp1, gp2, gp3;
 	private Salvo salvo1, salvo2, salvo3, salvo4;
 
 	public static void main(String[] args) {
@@ -38,7 +39,6 @@ public class Application extends SpringBootServletInitializer{
 								  GameRepository game_repository,
 								  GamePlayerRepository gp_repository,
 								  ShipRepository ship_repository,
-								  ShipLocationRepository sl_repository,
 								  SalvoRepository salvo_repository,
 								  SalvoLocationRepository salvo_loc_repo,
 								  GameScoreRepository score_repo) {
@@ -84,44 +84,16 @@ public class Application extends SpringBootServletInitializer{
 			gp_repository.save(new GamePlayer(game6, david));
 
 			// save new ships to jack, game 1
-			ship1 = ship_repository.save(new Ship("cruiser", gp1));
-			ship2 = ship_repository.save(new Ship("destroyer", gp1));
-			ship3 = ship_repository.save(new Ship("destroyer", gp1));
+			ship_repository.save(new Ship("cruiser", gp1, Arrays.asList("H2", "H3", "H4")));
+			ship_repository.save(new Ship("destroyer", gp1, Arrays.asList("E1", "F1")));
+			ship_repository.save(new Ship("destroyer", gp1, Arrays.asList("B4", "B5")));
 
 			// save new ships to chloe, game 1
-			ship4 = ship_repository.save(new Ship("cruiser", gp2));
-			ship5 = ship_repository.save(new Ship("destroyer", gp2));
+			ship_repository.save(new Ship("cruiser", gp2, Arrays.asList("B5", "C5", "D5")));
+			ship_repository.save(new Ship("destroyer", gp2, Arrays.asList("F1", "F2")));
 
 			// save one ship to jack, game 2
-			ship6 = ship_repository.save(new Ship("cruiser", gp3));
-
-			// create new shiplocation objects to hold all cell location of ships
-			// cell locations of ship1 cruiser for jack in game1
-			sl_repository.save(new ShipLocation(ship1, "H2"));
-			sl_repository.save(new ShipLocation(ship1, "H3"));
-			sl_repository.save(new ShipLocation(ship1, "H4"));
-
-			//cell locations of ship2 destroyer for jack in game1
-			sl_repository.save(new ShipLocation(ship2, "E1"));
-			sl_repository.save(new ShipLocation(ship2, "F1"));
-
-			//cell locations of ship3 destroy for jack in game1
-			sl_repository.save(new ShipLocation(ship3, "B4"));
-			sl_repository.save(new ShipLocation(ship3, "B5"));
-
-			//cell locations of ship4 cruiser for chloe in game1
-			sl_repository.save(new ShipLocation(ship4, "B5"));
-			sl_repository.save(new ShipLocation(ship4, "C5"));
-			sl_repository.save(new ShipLocation(ship4, "D5"));
-
-			//cell locations of ship5 destroyer for chloe in game1
-			sl_repository.save(new ShipLocation(ship5, "F1"));
-			sl_repository.save(new ShipLocation(ship5, "F2"));
-
-			//cell locations of ship6 cruiser for jack in game2
-			sl_repository.save(new ShipLocation(ship6, "B5"));
-			sl_repository.save(new ShipLocation(ship6, "C5"));
-			sl_repository.save(new ShipLocation(ship6, "D5"));
+			ship_repository.save(new Ship("cruiser", gp3, Arrays.asList("B5", "C5", "D5")));
 
 			//create salvo for Jack(gp1) and Chloe(gp2) turn 1 & 2 of game1
 			salvo1 = salvo_repository.save(new Salvo(gp1, 1));

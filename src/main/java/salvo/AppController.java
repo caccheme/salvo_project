@@ -236,16 +236,16 @@ public class AppController {
         private List<List<String>> getShipLocations(Set<Ship> ships) {
                 return ships
                         .stream()
-                        .map(ship -> makeShipLocationsList(ship.getShipLocations()))
+                        .map(ship -> ship.getShipLocations())
                         .collect(toList());
         }
 
-        private List<String> makeShipLocationsList(Set<ShipLocation> shipLocations) {
-                return shipLocations
-                        .stream()
-                        .map(sL -> sL.getShipLocationCell())
-                        .collect(toList());
-        }
+//        private List<String> makeShipLocationsList(List<String> shipLocations) {
+//                return shipLocations
+//                        .stream()
+//                        .map(sL -> sL.getShipLocationCell())
+//                        .collect(toList());
+//        }
 
         private Map<String, Object> makeShipDTO(GamePlayer gamePlayer) {
                 Map<String, Object> dto = new LinkedHashMap<String, Object>();
@@ -256,11 +256,9 @@ public class AppController {
                 return dto;
         }
 
-        private List<Set<ShipLocation>> makeShipLocationsDTO(Set<Ship> ships) {
+        private List<List<String>> makeShipLocationsDTO(Set<Ship> ships) {
                 return ships.stream().map(s -> s.getShipLocations()).collect(toList());
         }
-
-
 
         private Map<String, Object> getCurrentPlayer(Player player) {
                 Map<String, Object> dto = new LinkedHashMap<>();
