@@ -134,8 +134,50 @@ public class SalvoController {
         public Map<String, Object> getGameViewData(@PathVariable Long gamePlayer_Id) {
                 Map<String, Object> dto = new LinkedHashMap<>();
 
-                GamePlayer gamePlayer = gp_repository.findOne(gamePlayer_Id);
-                dto.put("player", makeGamePlayer(gamePlayer));
+                Game game = gp_repository.findOne(gamePlayer_Id).getGame();
+                dto.put("players", getPlayerInfo(game.getPlayers()));
+
+                return dto;
+        }
+
+        //new
+        private List<Object> getPlayerInfo(Set<GamePlayer> gamePlayers){
+                return gamePlayers
+                        .stream()
+                        .sorted(Comparator.comparing(GamePlayer::getId))
+                        .map(gp -> makePlayerShipDTO(gp))
+                        .collect(Collectors.toList());
+        }
+
+        //new
+        private Map<String, Object> makePlayerShipDTO(GamePlayer gamePlayer){
+                Map<String, Object> dto = new LinkedHashMap<>();
+
+                dto.put("gamePlayer_id", gamePlayer.getId());
+                dto.put("email", gamePlayer.getPlayer().getEmail());
+                dto.put("ships", collectShipData(gamePlayer.getShips()));
+
+                return dto;
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+        //new
+        private Map<String, Object> makeOpponentPlayer(GamePlayer gamePlayer){
+                Map<String, Object> dto = new LinkedHashMap<>();
+
+                dto.put("email", gamePlayer.getGame().getPlayers());
+                dto.put("gamePlayerId", gamePlayer.getId());
+                dto.put("ships", collectShipData(gamePlayer.getShips()));
 
                 return dto;
         }
@@ -329,8 +371,11 @@ public class SalvoController {
 
         //new
         private List<Object> getPlayers(Set<GamePlayer> players){
-                return players.stream().map(p -> makeNewPlayerDTO(p)).collect(Collectors.toList());
-
+                return players
+                        .stream()
+                        .sorted(Comparator.comparing(GamePlayer::getId))
+                        .map(p -> makeNewPlayerDTO(p))
+                        .collect(Collectors.toList());
         }
 
         //new

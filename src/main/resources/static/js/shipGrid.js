@@ -20,27 +20,37 @@ $(document).ready(function(){
         url: '/api/game_view/'+ gamePlayer_Id,
         dataType: 'json',
         success: function(data, textStatus, jqXHR) {
-                   shipLocationData = getLocations(data.player.ships);
+                   shipLocationData = getLocations(data);
                    tableCreate1(shipLocationData);
-                   showPlayerEmail(data.player.email);
+                   showPlayerEmail(data); //figure out what goes in here again
                 console.log(data);
                 console.log(shipLocationData);
 
         }
   });//end ajax
 
-      function getLocations(myArray) {
+      function getLocations(data) {
+      //myArray is data
           var newArray = [];
-          for (var i=0; i < myArray.length; i++){
-              for (var j = 0; j < myArray[i].locations.length ; j++){
-                          newArray.push(myArray[i].locations[j]);
+          for (var i=0; i < data.players.length; i++){
+              if (data.players[i].gamePlayer_id == gamePlayer_Id){ //get only one gamePlayer's ship locations
+                  for (var j = 0; j < data.players[i].ships.length ; j++){
+                     for (var k = 0; k < data.players[i].ships[j].locations.length; k++){
+                           newArray.push(data.players[i].ships[j].locations[k]);
+                     }
+                  }
               }
+
           }
           return newArray;
       }
 
-      function showPlayerEmail(player) {
-          $("#player_email").text("Welcome, "+ player + "!");
+      function showPlayerEmail(data) {
+        for (var i=0; i < data.players.length; i++){
+          if (data.players[i].gamePlayer_id == gamePlayer_Id){
+             $("#player_email").text("Welcome, "+ data.players[i].email + "!");
+          }
+        }
       }
 
      function tableCreate1(data) {
