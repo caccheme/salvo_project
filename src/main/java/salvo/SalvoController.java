@@ -156,11 +156,29 @@ public class SalvoController {
                 dto.put("gamePlayer_id", gamePlayer.getId());
                 dto.put("email", gamePlayer.getPlayer().getEmail());
                 dto.put("ships", collectShipData(gamePlayer.getShips()));
+                dto.put("salvoes", collectSalvoData(gamePlayer.getSalvoes()));
 
                 return dto;
         }
 
+        //new
+        private List<Object> collectSalvoData(Set<Salvo> salvoes){
+                return salvoes
+                        .stream()
+                        .sorted(Comparator.comparing(Salvo::getId))
+                        .map(s -> makeSalvoObject(s))
+                        .collect(Collectors.toList());
+        }
 
+        //new
+        private Map<String, Object> makeSalvoObject(Salvo salvo){
+                Map<String, Object> dto = new LinkedHashMap<>();
+
+                dto.put("turn", salvo.getTurn());
+                dto.put("locations", salvo.getSalvoLocations());
+
+                return dto;
+        }
 
 
 
@@ -250,12 +268,16 @@ public class SalvoController {
                 return dto;
         }
 
-        //old
+        //new
         private List<Object> collectShipData(Set<Ship> ships){
-                return ships.stream().map(s -> makeShipObject(s)).collect(Collectors.toList());
+                return ships
+                        .stream()
+                        .sorted(Comparator.comparing(Ship::getId))
+                        .map(s -> makeShipObject(s))
+                        .collect(Collectors.toList());
         }
 
-        //old
+        //new
         private Map<String, Object> makeShipObject(Ship ship){
                 Map<String, Object> dto = new LinkedHashMap<>();
 
