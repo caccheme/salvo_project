@@ -15,8 +15,6 @@ public class Salvo {
     @JoinColumn(name="gamePlayer_id")
     private GamePlayer gamePlayer;
 
-//    @OneToMany(mappedBy="salvo", fetch=FetchType.EAGER)
-//    Set<SalvoLocation> salvoLocations;
     @ElementCollection
     @Column(name="salvoLocations")
     private List<String> salvoLocations = new ArrayList<>();

@@ -13,13 +13,14 @@ import org.springframework.web.bind.annotation.RestController;
 import salvo.model.*;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
 
 
 @RestController
 @RequestMapping("/api")
-public class AppController {
+public class SalvoController {
 
 
         //-------------------Retrieve All Games and the games' players-----------------------------------
@@ -256,36 +257,25 @@ public class AppController {
         private Map<String, Object> makeGameDTO(Game game) {
                 Map<String, Object> dto = new LinkedHashMap<String, Object>();
 
-                dto.put("game_id", game.getId());
-                dto.put("date_created", game.getCreationDate());
-                dto.put("players", makePlayerDTO(game.getPlayers(), game.getScores()));
+                dto.put("id", game.getId());
+                dto.put("created", game.getCreationDate());
+                dto.put("players", getPlayers(game.getPlayers()));
 
                 return dto;
         }
 
-        private Map<String, Object> makePlayerDTO(Set<GamePlayer> players, Set<GameScore> scores) {
+        private List<Object> getPlayers(Set<GamePlayer> players){
+                return players.stream().map(p -> makeNewPlayerDTO(p)).collect(Collectors.toList());
+
+        }
+
+        private Map<String, Object> makeNewPlayerDTO(GamePlayer gamePlayer){
                 Map<String, Object> dto = new LinkedHashMap<>();
 
-                dto.put("player", getPlayerEmails(players));
-                dto.put("score", getScoresArray(scores));
+                dto.put("id", gamePlayer.getPlayer().getId());
+                dto.put("email", gamePlayer.getPlayer().getEmail());
 
-                return  dto;
-        }
-
-        private List<String> getPlayerEmails(Set<GamePlayer> players){
-                return players
-                        .stream()
-                        .sorted(Comparator.comparing(GamePlayer::getId))
-                        .map(p -> p.getPlayer().getEmail())
-                        .collect(toList());
-        }
-
-        private List<Double> getScoresArray(Set<GameScore> scores) {
-                return scores
-                        .stream()
-                        .sorted(Comparator.comparing(GameScore::getId))
-                        .map(score -> score.getScore())
-                        .collect(toList());
+                return dto;
         }
 
         private String getCurrentUsername() {
