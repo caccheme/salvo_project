@@ -5,21 +5,26 @@ $(document).ready(function(){
       }).done(function ( data ) {
       var games = [];
       console.log(data);
+      console.log(data.games);
+      console.log(data.games[0]);
+      console.log(data.games[0].created);//should give game date
+      console.log(data.games[0].players);
+      console.log(data.games[0].players[0]);
+      console.log(data.games[0].players[0].email);
 
       $.each(data, function(key, val) {
+        console.log(key); //games
+        console.log(val); //array of objects
         for (j=0; j<val.length; j++){
-            var date = (new Date(val[j].date_created + (60*60*1000*j)));
+            var date = (new Date(val[j].created + (60*60*1000*j)));
 
-                games.push('<li id="' + key + '">Date Created:    ' + date +
+                games.push('<li>Date Created:    ' + date +
                 '</li>');
-                    for (i=0; i < 2; i++) {
-                        if (val[j].players.player[i] && val[j].players.score[i] || val[j].players.player[i] && val[j].players.score[i] == 0){
-                            games.push('<ul><li>Player:    ' + val[j].players.player[i] + '     Score:     '
-                                            + val[j].players.score[i] +'</li></ul>');
-                        };
-                        if (val[j].players.player[i] && val[j].players.score[i] === undefined){
-                            games.push('<ul><li>Player:    ' + val[j].players.player[i] + '    Score: N/A (Game still in play)   </li></ul>');
-                        };
+                    for (i=0; i < val[j].players.length; i++) {
+
+                            games.push('<ul><li>Player:    ' + val[j].players[i].email +
+                                            '</li></ul>');
+
                     };
         }
 
