@@ -6,11 +6,12 @@ $(document).ready(function(){
 //get shipLocation data for a specific gamePlayer_Id
   $.ajax({
         method: "get",
-        url: '/api/gpShipLocations/'+ gamePlayer_Id,
+        url: '/api/game_view/'+ gamePlayer_Id,
         dataType: 'json',
         success: function(shipData, textStatus, jqXHR) {
-                   shipData = flattenArray(shipData.shipLocations);
+//                   shipData = flattenArray(shipData.shipLocations);
                    tableCreate1(shipData);
+            console.log(shipData);
 
         }
   });//end ajax
