@@ -20,16 +20,78 @@ $(document).ready(function(){
         url: '/api/game_view/'+ gamePlayer_Id,
         dataType: 'json',
         success: function(data, textStatus, jqXHR) {
-                   shipLocationData = getLocations(data);
+                   shipLocationData = getShipLocations(data);
+                   salvoLocationData = getSalvoData(data);
                    tableCreate1(shipLocationData);
+                   tableCreate2(data);
                    showPlayerEmail(data); //figure out what goes in here again
                 console.log(data);
                 console.log(shipLocationData);
+                console.log(salvoLocationData);
+
+                console.log(data.players[0].salvoes[0].location[0]);
 
         }
   });//end ajax
 
-      function getLocations(data) {
+
+       function getSalvoData(data){
+         var newArray = [];
+               for (var i=0; i < data.players.length; i++){
+                   if (data.players[i].gamePlayer_id == gamePlayer_Id){ //get only one gamePlayer's salvo locations
+                       for (var j = 0; j < data.players[i].salvoes.length ; j++){
+                          for (var k = 0; k < data.players[i].salvoes[j].locations.length; k++){
+                                newArray.push(data.players[i].salvoes[j].locations[k]);
+                          }
+                       }
+                   }
+               }
+         return newArray;
+       }
+
+
+
+      function getSalvoLocations(data) {
+      //myArray is data
+          var newArray = [];
+          var innerArray = [];
+          for (var i=0; i < data.players.length; i++){
+              if (data.players[i].gamePlayer_id == gamePlayer_Id){ //get only one gamePlayer's salvo locations
+                  for (var j = 0; j < data.players[i].salvoes.length ; j++){
+                     for (var k = 0; k < data.players[i].salvoes[j].locations.length; k++){
+                           newArray.push(data.players[i].salvoes[j].turn, data.players[i].salvoes[j].locations[k]);
+                     }
+                  }
+              }
+
+          }
+          return newArray;
+      }
+
+
+//// get turn number for each salvo shot at a certain location, to put into grid at that location
+//    function getTurnNumber(data, cellString){
+//        result = "";
+//        newArray = [];
+//        for (var i=0; i < data.players.length; i++){
+//                      if (data.players[i].gamePlayer_id == gamePlayer_Id){ //get only one gamePlayer's salvo locations
+//                          for (var j = 0; j < data.players[i].salvoes.length ; j++){
+//                             for (var k = 0; k < data.players[i].salvoes[j].locations.length; k++){
+//                                if (data.players[i].salvoes[j].location[k] &&   ///working right here trying to see what is undefined....
+//                                      data.players[i].salvoes[j].location[k] == cellString){
+//                                   result = data.players[i].salvoes[j].turn
+//                                }
+//                             }
+//                          }
+//                      }
+//
+//                  }
+//        return result;
+//    }
+
+
+
+      function getShipLocations(data) {
       //myArray is data
           var newArray = [];
           for (var i=0; i < data.players.length; i++){
@@ -132,6 +194,72 @@ $(document).ready(function(){
         return res;
      }
 
+//create salvo grid marked where gamePlayer has shot at opponent
+     function tableCreate2(data) {
+         var body = document.getElementsByTagName('div')[2];
+         var tbl = document.createElement('table');
+         tbl.style.width = '35%';
+         tbl.setAttribute('border', '1');
+         tbl.setAttribute('text-align', 'center');
+         var tbdy = document.createElement('tbody');
+         for (var i = 0; i < 11; i++) {
+             var tr = document.createElement('tr');
+
+             for (var j = 0; j < 11; j++) {
+                 if (j==0 && i==0){
+                    var td = document.createElement('td')
+                        td.appendChild(document.createTextNode(""))
+                        tr.appendChild(td)
+                 }
+                 if (j==0 && i!=0) {
+                   // output row header A-J for grid
+                   var td = document.createElement('td');
+                        td.appendChild(document.createTextNode(i))
+                            tr.appendChild(td)
+
+                 }
+                 if (i==0 && j!=0) {
+                 // output column header 1-10 for grid
+                    var td = document.createElement('td');
+                        td.appendChild(document.createTextNode(myAlphabetFunction(j)))
+                           tr.appendChild(td)
+                 }
+                 // quit making grid after made 11x11
+                 if (i == 11 && j == 11) {
+                     break
+                 }
+                 else if (i > 0 && j > 0) {
+                     var td = document.createElement('td');
+
+                    // create string values based on table position
+                    var jArray = [" ", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J"]; //so jArray[1] should = "A", etc
+
+                    function myConcatFunction(j, i) {
+                        var str1 = jArray[j];
+                        var str2 = i.toString();
+                        var res = str1.concat(str2);
+                        return res
+                    }
+
+                    var cellString = myConcatFunction(j,i);
+
+                    //  loop over rest of grid, check for salvoLocations
+
+                   salvoLocationData = getSalvoData(data);
+                    if (checkLocations(salvoLocationData, cellString) == true) {
+                       td.style.backgroundColor = "orange";
+//                       td.appendChild(document.createTextNode(getTurnNumber(data, cellString))); //need to add this still
+                     }
+                    tr.appendChild(td)
+                 }
+             }
+             tbdy.appendChild(tr);
+         }
+         tbl.appendChild(tbdy);
+         body.appendChild(tbl)
+     }
+
+
 
 
 
@@ -183,98 +311,7 @@ $(document).ready(function(){
 //         return res;
 //     }
 
-//////create salvo grid marked where gamePlayer has shot at opponent
-////     function tableCreate2(salvo) {
-////         var body = document.getElementsByTagName('div')[2];
-////         var tbl = document.createElement('table');
-////         tbl.style.width = '35%';
-////         tbl.setAttribute('border', '1');
-////         tbl.setAttribute('text-align', 'center');
-////         var tbdy = document.createElement('tbody');
-////         for (var i = 0; i < 11; i++) {
-////             var tr = document.createElement('tr');
-////
-////             for (var j = 0; j < 11; j++) {
-////                 if (j==0 && i==0){
-////                    var td = document.createElement('td')
-////                        td.appendChild(document.createTextNode(""))
-////                        tr.appendChild(td)
-////                 }
-////                 if (j==0 && i!=0) {
-////                   // output row header A-J for grid
-////                   var td = document.createElement('td');
-////                        td.appendChild(document.createTextNode(i))
-////                            tr.appendChild(td)
-////
-////                 }
-////                 if (i==0 && j!=0) {
-////                 // output column header 1-10 for grid
-////                    var td = document.createElement('td');
-////                        td.appendChild(document.createTextNode(myAlphabetFunction(j)))
-////                           tr.appendChild(td)
-////                 }
-////                 // quit making grid after made 11x11
-////                 if (i == 11 && j == 11) {
-////                     break
-////                 }
-////                 else if (i > 0 && j > 0) {
-////                     var td = document.createElement('td');
-////
-////                    // create string values based on table position
-////                    var jArray = [" ", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J"]; //so jArray[1] should = "A", etc
-////
-////                    function myConcatFunction(j, i) {
-////                        var str1 = jArray[j];
-////                        var str2 = i.toString();
-////                        var res = str1.concat(str2);
-////                        return res
-////                    }
-////
-////                    var cellString = myConcatFunction(j,i);
-////
-////                    //  loop over rest of grid, check for salvoLocations
-////                    if (checkLocations(getGamePlayerSalvoData(salvo), cellString) == true) {
-////                       td.style.backgroundColor = "orange";
-////                       td.appendChild(document.createTextNode(getTurnNumber(salvo, cellString)));
-////                     }
-////                    tr.appendChild(td)
-////                 }
-////             }
-////             tbdy.appendChild(tr);
-////         }
-////         tbl.appendChild(tbdy);
-////         body.appendChild(tbl)
-////     }
-//
-//      function getGamePlayerSalvoData(data){
-////        salvoData = data[0][0].salvoLocations[i].salvoLocationCell;
-////        salvoData = [];
-////
-//////                          console.log(salvo[0][0].salvoLocations[0].salvoLocationCell);
-//////                          console.log(salvo[0][0]);
-//        var result = ""
-//        for (var i = 0; i < data.length; i++) {
-//           if (data[i].gamePlayer_id == gamePlayer_Id) {
-//                result = flattenArray(data[i].salvo_locations);
-//           }
-//        }
-//        return result;
-//      }
-//
-//// get turn number for each salvo shot at a certain location, to put into grid at that location
-//    function getTurnNumber(data, cellString){
-//        result = ""
-//        for (var i = 0; i < data.length; i++) {
-//            for (var j=0; j < data[i].salvo_locations.length; j++){
-//                for (var k=0; k < data[i].salvo_locations[j].length; k++){
-//                    if (data[i].salvo_locations[j][k] == cellString){
-//                        result = j+1
-//                    }
-//                }
-//            }
-//        }
-//        return result;
-//    }
+
 //
 //// get opponent turn number from opponent salvo data and use to mark hits on ship grid
 //    function getOpponentTurnNumber(data, cellString) {

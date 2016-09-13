@@ -190,22 +190,6 @@ public class SalvoController {
 
 
         //new
-        private Map<String, Object> makeOpponentPlayer(GamePlayer gamePlayer){
-                Map<String, Object> dto = new LinkedHashMap<>();
-
-                dto.put("email", gamePlayer.getGame().getPlayers());
-                dto.put("gamePlayerId", gamePlayer.getId());
-                dto.put("ships", collectShipData(gamePlayer.getShips()));
-
-                return dto;
-        }
-
-
-
-
-
-
-        //new
         @RequestMapping("/gpGames/{gamePlayer_Id}")
         public Map<String, Object> makeNewScoresDTO(@PathVariable Long gamePlayer_Id) {
                 Map<String, Object> dto = new LinkedHashMap<>();
@@ -384,9 +368,9 @@ public class SalvoController {
         private Map<String, Object> makeGameDTO(Game game) {
                 Map<String, Object> dto = new LinkedHashMap<String, Object>();
 
-                dto.put("id", game.getId());
-                dto.put("created", game.getCreationDate());
-                dto.put("players", getPlayers(game.getPlayers()));
+                dto.put("game_id", game.getId());
+                dto.put("game_created", game.getCreationDate());
+                dto.put("gamePlayers", getPlayers(game.getPlayers()));
 
                 return dto;
         }
@@ -404,8 +388,18 @@ public class SalvoController {
         private Map<String, Object> makeNewPlayerDTO(GamePlayer gamePlayer){
                 Map<String, Object> dto = new LinkedHashMap<>();
 
-                dto.put("id", gamePlayer.getPlayer().getId());
-                dto.put("email", gamePlayer.getPlayer().getEmail());
+                dto.put("gamePlayer_id", gamePlayer.getId());
+                dto.put("player", getPlayerData(gamePlayer.getPlayer()));
+
+                return dto;
+        }
+
+        //new
+        private Map<String, Object> getPlayerData(Player player){
+                Map<String, Object> dto = new LinkedHashMap<>();
+
+                dto.put("player_id", player.getId());
+                dto.put("player_email", player.getEmail());
 
                 return dto;
         }
