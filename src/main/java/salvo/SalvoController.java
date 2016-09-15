@@ -135,7 +135,13 @@ public class SalvoController {
                 Map<String, Object> dto = new LinkedHashMap<>();
 
                 Game game = gp_repository.findOne(gamePlayer_Id).getGame();
-                dto.put("players", getPlayerInfo(game.getPlayers()));
+                GamePlayer gamePlayer = gp_repository.findOne(gamePlayer_Id);
+
+                dto.put("game_id", game.getId());
+                dto.put("game_created", game.getCreationDate());
+                dto.put("main_player", gamePlayer.getPlayer().getEmail());
+                dto.put("gamePlayers", getPlayerInfo(game.getPlayers()));
+                dto.put("main_player_ships", collectShipData(gamePlayer.getShips()));
 
                 return dto;
         }
@@ -145,17 +151,26 @@ public class SalvoController {
                 return gamePlayers
                         .stream()
                         .sorted(Comparator.comparing(GamePlayer::getId))
-                        .map(gp -> makePlayerShipDTO(gp))
+                        .map(gp -> makePlayerDTO2(gp))
                         .collect(Collectors.toList());
         }
 
         //new
-        private Map<String, Object> makePlayerShipDTO(GamePlayer gamePlayer){
+        private Map<String, Object> makePlayerDTO2(GamePlayer gamePlayer){
                 Map<String, Object> dto = new LinkedHashMap<>();
 
                 dto.put("gamePlayer_id", gamePlayer.getId());
-                dto.put("email", gamePlayer.getPlayer().getEmail());
-                dto.put("ships", collectShipData(gamePlayer.getShips()));
+                dto.put("player_info", makePlayerShipSalvoDTO(gamePlayer.getPlayer(), gamePlayer));
+
+                return dto;
+        }
+
+        //new
+        private Map<String, Object> makePlayerShipSalvoDTO(Player player, GamePlayer gamePlayer){
+                Map<String, Object> dto = new LinkedHashMap<>();
+
+                dto.put("player_id", player.getId());
+                dto.put("email", player.getEmail());
                 dto.put("salvoes", collectSalvoData(gamePlayer.getSalvoes()));
 
                 return dto;
@@ -416,4 +431,3 @@ public class SalvoController {
         }
 
 }
-
