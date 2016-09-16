@@ -27,7 +27,7 @@ public class Application extends SpringBootServletInitializer{
 
 	//	private Player jack, chloe, kim, david, michelle;
 	private Game game1, game2, game3, game4, game5, game6;
-	private GamePlayer gp1, gp2, gp3;
+	private GamePlayer gp1, gp2, gp3, gp4, gp5, gp6, gp7, gp8;
 
 	public static void main(String[] args) {
 		SpringApplication.run(Application.class);
@@ -64,15 +64,15 @@ public class Application extends SpringBootServletInitializer{
 
 			//jack and chloe to game 2
 			gp3 = gp_repository.save(new GamePlayer(game2, jack));
-			gp_repository.save(new GamePlayer(game2, chloe));
+			gp4 = gp_repository.save(new GamePlayer(game2, chloe));
 
 			//chloe and tim to game3
-			gp_repository.save(new GamePlayer(game3, chloe));
-			gp_repository.save(new GamePlayer(game3, tim));
+			gp5 = gp_repository.save(new GamePlayer(game3, chloe));
+			gp6 = gp_repository.save(new GamePlayer(game3, tim));
 
 			// jack and chloe to game4
-			gp_repository.save(new GamePlayer(game4, jack));
-			gp_repository.save(new GamePlayer(game4, chloe));
+			gp7 = gp_repository.save(new GamePlayer(game4, jack));
+			gp8 = gp_repository.save(new GamePlayer(game4, chloe));
 
 			// tim and jack to game5
 			gp_repository.save(new GamePlayer(game5, tim));
@@ -100,24 +100,24 @@ public class Application extends SpringBootServletInitializer{
 			salvo_repository.save(new Salvo(gp2, 2, Arrays.asList("E1", "H3", "A2")));
 
 			//create winning '1' gameScore for jack in game1
-			score_repo.save(new GameScore(game1, jack, 1));
+			score_repo.save(new GameScore(game1, gp1, 1));
 
 			//create losing '0' gameScore for chloe in game1
-			score_repo.save(new GameScore(game1, chloe, 0));
+			score_repo.save(new GameScore(game1, gp2, 0));
 
 			//create tie scores '0.5' for game2 for jack and chloe
-			score_repo.save(new GameScore(game2, jack, 0.5));
-			score_repo.save(new GameScore(game2, chloe, 0.5));
+			score_repo.save(new GameScore(game2, gp3, 0.5));
+			score_repo.save(new GameScore(game2, gp4, 0.5));
 
 			//create winning score for chloe in game3
-			score_repo.save(new GameScore(game3, chloe, 1));
+			score_repo.save(new GameScore(game3, gp5, 1));
 
 			//create losing score for tim in game3
-			score_repo.save(new GameScore(game3, tim, 0));
+			score_repo.save(new GameScore(game3, gp6, 0));
 
 			//create tie scores for jack and chloe in game4
-			score_repo.save(new GameScore(game4, jack, 0.5));
-			score_repo.save(new GameScore(game4, chloe, 0.5));
+			score_repo.save(new GameScore(game4, gp7, 0.5));
+			score_repo.save(new GameScore(game4, gp8, 0.5));
 
 		};
 	}

@@ -32,30 +32,6 @@ public class SalvoController {
         @Autowired
         private PlayerRepository playerRepository;
 
-//        //old
-//        @RequestMapping("/gpScores/{gamePlayer_Id}")
-//        public Map<String, Object> makeGamePlayerScoresDTO(@PathVariable Long gamePlayer_Id) {
-//                Map<String, Object> dto = new LinkedHashMap<>();
-//
-//                //collect score data for one gamePlayer only
-//                GamePlayer gamePlayer = gp_repository.findOne(gamePlayer_Id);
-//                dto.put("email", gamePlayer.getPlayer().getEmail());
-//                dto.put("scores", getPlayerScores(gamePlayer.getPlayer().getScores()));
-//
-//                return dto;
-//        }
-//
-//        //old
-//        //all scores for all gamePlayers
-//        @RequestMapping("/scores")
-//        public List<Object> getAllScores() {
-//                return  gp_repository
-//                        .findAll()
-//                        .stream()
-//                        .map(g -> makeScoresDTO(g))
-//                        .collect(toList());
-//        }
-
         @RequestMapping("/games")
         public Map<String, Object> getGames() {
                 Map<String, Object> dto = new LinkedHashMap<>();
@@ -111,6 +87,8 @@ public class SalvoController {
                 dto.put("player_id", player.getId());
                 dto.put("email", player.getEmail());
                 dto.put("salvoes", collectSalvoData(gamePlayer.getSalvoes()));
+//                dto.put("scores", PlayerScores(gamePlayer.getPlayer().getScores()));
+
 
                 return dto;
         }
@@ -251,7 +229,9 @@ public class SalvoController {
                 Map<String, Object> dto = new LinkedHashMap<>();
 
                 dto.put("gamePlayer_id", gamePlayer.getId());
+                dto.put("gamePlayer_score", makeScoresListDTO(gamePlayer.getScores()));
                 dto.put("player", getPlayerData(gamePlayer.getPlayer()));
+//                dto.put("scores", makeScoresListDTO(gamePlayer.getPlayer().getScores())); //makes list of all scores for that player but not specific game
 
                 return dto;
         }
@@ -263,6 +243,10 @@ public class SalvoController {
                 dto.put("player_email", player.getEmail());
 
                 return dto;
+        }
+
+        private List<Double> makeScoresListDTO(Set<GameScore> scores) {
+                return scores.stream().map(s -> s.getScore()).collect(toList());
         }
 
         private String getCurrentUsername() {

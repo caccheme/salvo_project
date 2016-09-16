@@ -1,7 +1,5 @@
 package salvo.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import javax.persistence.*;
 import java.util.Date;
 import java.util.Set;
@@ -27,6 +25,9 @@ public class GamePlayer {
 
     @OneToMany(mappedBy="gamePlayer", fetch=FetchType.EAGER)
     Set<Salvo> salvoes;
+
+    @OneToMany(mappedBy="gamePlayer", fetch=FetchType.EAGER)
+    Set<GameScore> scores;
 
     public GamePlayer() { joinDate = new Date(); }
 
@@ -60,15 +61,17 @@ public class GamePlayer {
         this.game = game;
     }
 
-    @JsonIgnore //to prevent infinite loop
     public Set<Ship> getShips() {
         return ships;
     }
 
-    @JsonIgnore //to prevent infinite loop
     public Set<Salvo> getSalvoes() {
         return salvoes;
     }
+
+	public Set<GameScore> getScores() {
+		return scores;
+	}
 
     @Override
     public String toString() {
