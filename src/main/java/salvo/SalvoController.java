@@ -116,6 +116,7 @@ public class SalvoController {
 //let's get the user and if there isn't one: can't see this
 //then check that user can only see their own game page (is the gamePlayer player the same as the currentUser logged in?)
                 //collect score data for one gamePlayer only
+
                 GamePlayer gamePlayer = gp_repository.findOne(gamePlayer_Id);
 
                 Set<GamePlayer> games = gamePlayer.getPlayer().getGames();
@@ -211,33 +212,34 @@ public class SalvoController {
 
                 dto.put("game_id", game.getId());
                 dto.put("game_created", game.getCreationDate());
-                dto.put("gamePlayers", getPlayers(game.getPlayers()));
-                dto.put("scores", getScores(game.getScores()));
+                dto.put("gamePlayers", getGamePlayers(game.getPlayers()));
 
                 return dto;
         }
 
-        private List<Object> getPlayers(Set<GamePlayer> players){
+        private List<Object> getGamePlayers(Set<GamePlayer> players){
                 return players
                         .stream()
                         .sorted(Comparator.comparing(GamePlayer::getId))
-                        .map(p -> makeNewPlayerDTO(p))
+                        .map(p -> makeNewGamePlayerDTO(p))
                         .collect(Collectors.toList());
         }
 
-        private List<Object> getScores(Set<GameScore> scores){
+        private List<Object> getScores(Set<GameScore> scores, Long playerId){
                 return scores
                         .stream()
-                        .sorted(Comparator.comparing(GameScore::getId))
+                        .filter(s -> s.getPlayer().getId() == playerId)
                         .map(s -> makeNewScoreDTO(s))
                         .collect(Collectors.toList());
         }
 
-        private Map<String, Object> makeNewPlayerDTO(GamePlayer gamePlayer){
+        private Map<String, Object> makeNewGamePlayerDTO(GamePlayer gamePlayer){
                 Map<String, Object> dto = new LinkedHashMap<>();
 
                 dto.put("gamePlayer_id", gamePlayer.getId());
-                dto.put("player", getPlayerData(gamePlayer.getPlayer()));
+                dto.put("player_id", gamePlayer.getPlayer().getId());
+                dto.put("email", gamePlayer.getPlayer().getEmail());
+                dto.put("score", getScores(gamePlayer.getGame().getScores(), gamePlayer.getPlayer().getId()));
 
                 return dto;
         }
@@ -245,18 +247,7 @@ public class SalvoController {
         private Map<String, Object> makeNewScoreDTO(GameScore score){
                 Map<String, Object> dto = new LinkedHashMap<>();
 
-                dto.put("player_id", score.getPlayer().getId());
-                dto.put("email", score.getPlayer().getEmail());
                 dto.put("score", score.getScore());
-
-                return dto;
-        }
-
-        private Map<String, Object> getPlayerData(Player player){
-                Map<String, Object> dto = new LinkedHashMap<>();
-
-                dto.put("player_id", player.getId());
-                dto.put("player_email", player.getEmail());
 
                 return dto;
         }
