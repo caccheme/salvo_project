@@ -212,6 +212,7 @@ public class SalvoController {
                 dto.put("game_id", game.getId());
                 dto.put("game_created", game.getCreationDate());
                 dto.put("gamePlayers", getPlayers(game.getPlayers()));
+                dto.put("scores", getScores(game.getScores()));
 
                 return dto;
         }
@@ -224,11 +225,29 @@ public class SalvoController {
                         .collect(Collectors.toList());
         }
 
+        private List<Object> getScores(Set<GameScore> scores){
+                return scores
+                        .stream()
+                        .sorted(Comparator.comparing(GameScore::getId))
+                        .map(s -> makeNewScoreDTO(s))
+                        .collect(Collectors.toList());
+        }
+
         private Map<String, Object> makeNewPlayerDTO(GamePlayer gamePlayer){
                 Map<String, Object> dto = new LinkedHashMap<>();
 
                 dto.put("gamePlayer_id", gamePlayer.getId());
                 dto.put("player", getPlayerData(gamePlayer.getPlayer()));
+
+                return dto;
+        }
+
+        private Map<String, Object> makeNewScoreDTO(GameScore score){
+                Map<String, Object> dto = new LinkedHashMap<>();
+
+                dto.put("player_id", score.getPlayer().getId());
+                dto.put("email", score.getPlayer().getEmail());
+                dto.put("score", score.getScore());
 
                 return dto;
         }
