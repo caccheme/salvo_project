@@ -36,7 +36,7 @@ public class SalvoController {
         public Map<String, Object> getGames() {
                 Map<String, Object> dto = new LinkedHashMap<>();
 
-                String name = getCurrentUsername();
+                String name = getCurrentUsername();//DRY this out
 
                 if (name != null) {
                         Player currentPlayer = playerRepository.findOneByEmail(getCurrentUsername());
@@ -53,7 +53,24 @@ public class SalvoController {
                 Map<String, Object> dto = new LinkedHashMap<>();
 
                 Game game = gp_repository.findOne(gamePlayer_Id).getGame();
+
+ //put in a check that there is a gameplayer with the gamePlayer_Id before showing page (null pointer otherwise)
+
+                String name = getCurrentUsername();//DRY this out...function getPlayer(..return this or null (can't look at view))
+
+
                 GamePlayer gamePlayer = gp_repository.findOne(gamePlayer_Id);
+
+
+                //should send back response entity Status.FORBIDDEN is what we want when the gamePlayer_Id == null or isn't a real gamePlayer
+                // get currentPlayer (Object) and check that it is the same as gamePlayer.getPlayer()
+                //if it is the same then they can see the page (Status.OK) otherwise (Status.UNAUTHORIZED)
+                //if admin...then can see it even if not gamePlayer...
+                //inside this all the dto code
+                //response entity will be wrapped around the map you are returning Response Entity{Map<String,Object>, STATUS...}
+//                if (){
+//
+//                }
 
                 dto.put("game_id", game.getId());
                 dto.put("game_created", game.getCreationDate());
@@ -137,7 +154,7 @@ public class SalvoController {
 //                GamePlayer gamePlayer = gp_repository.findOne(gamePlayerId);
 //                String player_name = gamePlayer.getPlayer().getEmail();
 //                if (player_name != getCurrentUsername()) {
-//                        return makeResponse(null, HttpStatus.UNAUTHORIZED);
+//                        return makeResponse(null, HttpStatus.UNAUTHORIZED); //looking for this kind of return
 //                }
 //                else {
 //                        Map<String, Object> dto = new LinkedHashMap<String, Object>();
@@ -237,9 +254,7 @@ public class SalvoController {
                 Map<String, Object> dto = new LinkedHashMap<>();
 
                 dto.put("gamePlayer_id", gamePlayer.getId());
-                dto.put("player_id", gamePlayer.getPlayer().getId());
-                dto.put("email", gamePlayer.getPlayer().getEmail());
-                dto.put("score", getScores(gamePlayer.getGame().getScores(), gamePlayer.getPlayer().getId()));
+                dto.put("player",  getScores(gamePlayer.getGame().getScores(), gamePlayer.getPlayer().getId()));
 
                 return dto;
         }
@@ -247,6 +262,8 @@ public class SalvoController {
         private Map<String, Object> makeNewScoreDTO(GameScore score){
                 Map<String, Object> dto = new LinkedHashMap<>();
 
+                dto.put("id", score.getPlayer().getId());
+                dto.put("email", score.getPlayer().getEmail());
                 dto.put("score", score.getScore());
 
                 return dto;
