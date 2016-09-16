@@ -12,10 +12,10 @@ public class GameScore {
     private Date finishDate;
     private double score;
 
- //one gamePlayer to one score   //pretending it's one to many...
+    //one player to many scores
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name="gamePlayer_id")
-    private GamePlayer gamePlayer; //gamePlayer reference
+    @JoinColumn(name="player_id")
+    private Player player; //player reference
 
     //one game to many scores
     @ManyToOne(fetch = FetchType.EAGER)
@@ -24,9 +24,9 @@ public class GameScore {
 
     public GameScore() { finishDate = new Date(); }
 
-    public GameScore(Game game, GamePlayer gamePlayer, double score) {
+    public GameScore(Game game, Player player, double score) {
         this.game = game;
-        this.gamePlayer = gamePlayer;
+        this.player = player;
         this.score = score;
     }
 
@@ -38,12 +38,12 @@ public class GameScore {
         this.finishDate = date;
     }
 
-    public GamePlayer getGamePlayer() {
-        return gamePlayer;
+    public Player getPlayer() {
+        return player;
     }
 
-    public void setGamePlayer(Player player) {
-        this.gamePlayer = gamePlayer;
+    public void setPlayer(Player player) {
+        this.player = player;
     }
 
     public Game getGame() {
