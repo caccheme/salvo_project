@@ -91,7 +91,7 @@ public class SalvoController {
                         .stream()
                         .sorted(Comparator.comparing(GamePlayer::getId))
                         .map(gp -> makePlayerDTO2(gp))
-                        .collect(Collectors.toList());
+                        .collect(toList());
         }
 
         private Map<String, Object> makePlayerDTO2(GamePlayer gamePlayer){
@@ -119,7 +119,7 @@ public class SalvoController {
                         .stream()
                         .sorted(Comparator.comparing(Salvo::getId))
                         .map(s -> makeSalvoObject(s))
-                        .collect(Collectors.toList());
+                        .collect(toList());
         }
 
         private Map<String, Object> makeSalvoObject(Salvo salvo){
@@ -136,7 +136,7 @@ public class SalvoController {
                         .stream()
                         .sorted(Comparator.comparing(Ship::getId))
                         .map(s -> makeShipObject(s))
-                        .collect(Collectors.toList());
+                        .collect(toList());
         }
 
         private Map<String, Object> makeShipObject(Ship ship){
@@ -180,26 +180,29 @@ public class SalvoController {
                         .stream()
                         .sorted(Comparator.comparing(GamePlayer::getId))
                         .map(p -> makeNewGamePlayerDTO(p))
-                        .collect(Collectors.toList());
-        }
-
-        private List<Object> getScores(Set<GameScore> scores, Long playerId){
-                return scores
-                        .stream()
-                        .filter(s -> s.getPlayer().getId() == playerId)
-                        .map(s -> makeNewScoreDTO(s))
-                        .collect(Collectors.toList());
+                        .collect(toList());
         }
 
         private Map<String, Object> makeNewGamePlayerDTO(GamePlayer gamePlayer){
                 Map<String, Object> dto = new LinkedHashMap<>();
 
                 dto.put("gamePlayer_id", gamePlayer.getId());
-                dto.put("player",  getScores(gamePlayer.getGame().getScores(), gamePlayer.getPlayer().getId()));
+                dto.put("player_id", gamePlayer.getPlayer().getId());
+                dto.put("player_email", gamePlayer.getPlayer().getEmail());
+                dto.put("score",  getScore(gamePlayer.getGame().getScores(), gamePlayer.getPlayer().getId()));
 
                 return dto;
         }
 
+        private Object getScore(Set<GameScore> scores, Long playerId){
+                return scores
+                        .stream()
+                        .filter(s -> s.getPlayer().getId() == playerId)
+                        .map(score -> score.getScore())
+                        .collect(Collectors.toList());
+        }
+
+        ///need this?
         private Map<String, Object> makeNewScoreDTO(GameScore score){
                 Map<String, Object> dto = new LinkedHashMap<>();
 
