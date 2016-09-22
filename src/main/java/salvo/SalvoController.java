@@ -49,36 +49,41 @@ public class SalvoController {
         }
 
         @RequestMapping("/game_view/{gamePlayer_Id}")
-        public Map<String, Object> getGameViewData(@PathVariable Long gamePlayer_Id) {
+        public ResponseEntity<Map<String, Object>> getGameViewData(@PathVariable Long gamePlayer_Id) {
                 Map<String, Object> dto = new LinkedHashMap<>();
+                ResponseEntity result = new ResponseEntity(null, null);
 
-                Game game = gp_repository.findOne(gamePlayer_Id).getGame();
-
- //put in a check that there is a gameplayer with the gamePlayer_Id before showing page (null pointer otherwise)
-
-                String name = getCurrentUsername();//DRY this out...function getPlayer(..return this or null (can't look at view))
-
-
+                String currentPlayer = getCurrentUsername();
                 GamePlayer gamePlayer = gp_repository.findOne(gamePlayer_Id);
+                String gpPlayer = gamePlayer.getPlayer().getEmail();
 
+                if (gp_repository.findOne(gamePlayer_Id) == null || gamePlayer_Id == null){
+                        result = makeResponse(null, HttpStatus.FORBIDDEN);
+                }
+                if (gpPlayer != currentPlayer){
+                        result = makeResponse(null, HttpStatus.UNAUTHORIZED);
+                }
+                //if admin...then can see it even if not gamePlayer...///extra work to do later
 
-                //should send back response entity Status.FORBIDDEN is what we want when the gamePlayer_Id == null or isn't a real gamePlayer
-                // get currentPlayer (Object) and check that it is the same as gamePlayer.getPlayer()
-                //if it is the same then they can see the page (Status.OK) otherwise (Status.UNAUTHORIZED)
-                //if admin...then can see it even if not gamePlayer...
-                //inside this all the dto code
-                //response entity will be wrapped around the map you are returning Response Entity{Map<String,Object>, STATUS...}
-//                if (){
-//
-//                }
+                if (gpPlayer == currentPlayer){
+                        Game game = gp_repository.findOne(gamePlayer_Id).getGame();
 
-                dto.put("game_id", game.getId());
-                dto.put("game_created", game.getCreationDate());
-                dto.put("main_player", gamePlayer.getPlayer().getEmail());
-                dto.put("gamePlayers", getPlayerInfo(game.getPlayers()));
-                dto.put("main_player_ships", collectShipData(gamePlayer.getShips()));
+                        dto.put("game_id", game.getId());
+                        dto.put("game_created", game.getCreationDate());
+                        dto.put("main_player", gamePlayer.getPlayer().getEmail());
+                        dto.put("gamePlayers", getPlayerInfo(game.getPlayers()));
+                        dto.put("main_player_ships", collectShipData(gamePlayer.getShips()));
 
-                return dto;
+                        result = makeResponse(dto, HttpStatus.OK);
+                }
+
+                return result;
+        }
+
+        private ResponseEntity<Map<String, Object>> makeResponse (Map<String, Object> dto, HttpStatus status){
+                ResponseEntity result = new ResponseEntity(dto, status);
+
+                return result;
         }
 
         private List<Object> getPlayerInfo(Set<GamePlayer> gamePlayers){
@@ -122,70 +127,6 @@ public class SalvoController {
 
                 dto.put("turn", salvo.getTurn());
                 dto.put("locations", salvo.getSalvoLocations());
-
-                return dto;
-        }
-
-        //new
-        @RequestMapping("/gpGames/{gamePlayer_Id}")
-        public Map<String, Object> makeNewScoresDTO(@PathVariable Long gamePlayer_Id) {
-                Map<String, Object> dto = new LinkedHashMap<>();
-//let's get the user and if there isn't one: can't see this
-//then check that user can only see their own game page (is the gamePlayer player the same as the currentUser logged in?)
-                //collect score data for one gamePlayer only
-
-                GamePlayer gamePlayer = gp_repository.findOne(gamePlayer_Id);
-
-                Set<GamePlayer> games = gamePlayer.getPlayer().getGames();
-                List<Set<GameScore>> scores = games.stream().map(g -> g.getGame().getScores()).collect(toList());
-
-                dto.put("email", gamePlayer.getPlayer().getEmail());
-                dto.put("scores", scores);
-
-                return dto;
-        }
-
-//        //superfluous...see above public method makeNewSocreDTO...need to rename this...
-//        //get the logged in user, get the GamePlayer with the ID in the /rest URL, and see if they're consistent
-//        @RequestMapping(path = "/game/{gamePlayerId}", method = RequestMethod.POST)
-//        //gamePlayerId should come from URL, name should come from Player info
-//        public ResponseEntity<Map<String, Object>> checkUser(@RequestParam long gamePlayerId) {
-//                //get gamePlayer record from ID of URL
-//                GamePlayer gamePlayer = gp_repository.findOne(gamePlayerId);
-//                String player_name = gamePlayer.getPlayer().getEmail();
-//                if (player_name != getCurrentUsername()) {
-//                        return makeResponse(null, HttpStatus.UNAUTHORIZED); //looking for this kind of return
-//                }
-//                else {
-//                        Map<String, Object> dto = new LinkedHashMap<String, Object>();
-//                        return makeResponse(makeAccountDTO(gamePlayer), HttpStatus.OK);
-//                }
-//        }
-
-        //        function to make a ResponseEntity with a Map<String, Object>...still working on the below as sub methods for the above...
-        private ResponseEntity<Map<String, Object>> makeResponse (Map<String, Object> dto, HttpStatus status){
-
-
-                return null; //placeholder for now...not sure what this will give....
-        }
-
-        //new
-        private Map<String, Object> makeAccountDTO(GamePlayer user){
-                Map<String, Object> dto = new LinkedHashMap<>();
-
-                dto.put("user_name", user.getPlayer().getEmail());
-                dto.put("user_password", user.getPlayer().getPassword());
-
-                return  dto;
-        }
-
-        //new
-        private Map<String, Object> makeGamePlayer(GamePlayer gamePlayer){
-                Map<String, Object> dto = new LinkedHashMap<>();
-
-                dto.put("email", gamePlayer.getPlayer().getEmail());
-                dto.put("gamePlayerId", gamePlayer.getId());
-                dto.put("ships", collectShipData(gamePlayer.getShips()));
 
                 return dto;
         }
