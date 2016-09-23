@@ -202,17 +202,6 @@ public class SalvoController {
                         .collect(Collectors.toList());
         }
 
-        ///need this?
-        private Map<String, Object> makeNewScoreDTO(GameScore score){
-                Map<String, Object> dto = new LinkedHashMap<>();
-
-                dto.put("id", score.getPlayer().getId());
-                dto.put("email", score.getPlayer().getEmail());
-                dto.put("score", score.getScore());
-
-                return dto;
-        }
-
         private String getCurrentUsername() {
                 Authentication auth = SecurityContextHolder.getContext().getAuthentication();
                 if (auth == null || !auth.isAuthenticated() || auth instanceof AnonymousAuthenticationToken) {
