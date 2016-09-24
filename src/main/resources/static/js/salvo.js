@@ -46,7 +46,7 @@ $(document).ready(function(){
              tbl.setAttribute('text-align', 'center');
              var tbdy = document.createElement('tbody');
              if (data.player){ //get player info if player logged in
-                var emails = [data.player.name];
+                var emails = getOpponentPlayerEmails(data); //gets logged in player email and opponents of that player
                 var length = emails.length + 1;
              }
              else { //if player isn't signed in, show all games' scores
@@ -140,6 +140,30 @@ $(document).ready(function(){
             if($.inArray(el, uniqueNames) === -1) uniqueNames.push(el);
         });
         return uniqueNames; //["j.bauer@ctu.gov", "c.obrian@ctu.gov", "t.almeida@ctu.gov", "palmer@whitehouse.gov"]
+    }
+
+    function getOpponentPlayerEmails(data){
+        var arr = [];
+        var currentUser = data.player.name
+        arr.push(currentUser);
+
+        //create array of player email and player's opponent emails only, will have duplicates
+        for (i=0; i< data.games.length; i++) {
+            for (j=0; j< data.games[i].gamePlayers.length; j++){
+                if (currentUser = data.games[i].gamePlayers[j].player_email && data.games[i].gamePlayers[j+1]){
+                    if (data.games[i].gamePlayers[j].score[0] == 1 || data.games[i].gamePlayers[j].score[0] == 0
+                            || data.games[i].gamePlayers[j].score[0] == 0.5){//only games with scores
+                       arr.push(data.games[i].gamePlayers[j].player_email);
+                    }
+                }
+            }
+        }
+
+        var uniqueNames = [];
+        $.each(arr, function(i, el){
+            if($.inArray(el, uniqueNames) === -1) uniqueNames.push(el);
+        });
+        return uniqueNames;
     }
 
     function getAllScores(data, emails){
