@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RestController;
 import salvo.model.*;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
 
@@ -189,17 +188,19 @@ public class SalvoController {
                 dto.put("gamePlayer_id", gamePlayer.getId());
                 dto.put("player_id", gamePlayer.getPlayer().getId());
                 dto.put("player_email", gamePlayer.getPlayer().getEmail());
-                dto.put("score",  getScore(gamePlayer.getGame().getScores(), gamePlayer.getPlayer().getId()));
+                dto.put("score",  findScore(gamePlayer.getGame().getScores(), gamePlayer.getPlayer().getId()));
 
                 return dto;
         }
 
-        private Object getScore(Set<GameScore> scores, Long playerId){
-                return scores
-                        .stream()
-                        .filter(s -> s.getPlayer().getId() == playerId)
-                        .map(score -> score.getScore())
-                        .collect(Collectors.toList());
+        private Object findScore(Set<GameScore> scores, Long playerId){
+                GameScore score = scores.stream().filter(s -> s.getPlayer().getId() == playerId)
+                        .findFirst().orElse(null);
+
+                if (score != null){
+                        return score.getScore();
+                }
+                return null;
         }
 
         private String getCurrentUsername() {
