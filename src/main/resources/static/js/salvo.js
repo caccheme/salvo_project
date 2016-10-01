@@ -18,11 +18,11 @@ $(document).ready(function(){
           var doc = document
           var date = (new Date(data.games[i].game_created + (60*60*1000*i)));
           for (var j=0; j< data.games[i].gamePlayers.length ; j++) {
-                if (data.games[i].gamePlayers[j].score.length != 0){ //check that score isn't empty
+                if (data.games[i].gamePlayers[j].score != 0){ //check that score isn't empty
                     text += "<li> Game Started on:  " + date +
                                   "<ul><li>Player:  " + data.games[i].gamePlayers[j].player_email
                                   + "</li><li>  Game Score:   "
-                                  + data.games[i].gamePlayers[j].score[0] + "</ul></li>" +
+                                  + data.games[i].gamePlayers[j].score + "</ul></li>" +
                                   "</li>";
                 }
                 else { //if no score posted yet

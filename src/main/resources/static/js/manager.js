@@ -5,68 +5,71 @@ $(document).ready(function(){
           dataType: 'json',
           success: function(data, textStatus, jqXHR) {
                         createGamesList(data);
-//                        leaderBoardCreate(data);
+                        leaderBoardCreate(data);
                         console.log(data);
          }
       });//end of ajax
+
+  function gameLinkId(game, player_id) {
+    result = null;
+    for (j=0; j< game.gamePlayers.length; j++){
+        if (game.gamePlayers[j].player_id == player_id){
+            result = game.gamePlayers[j].gamePlayer_id;
+        }
+    }
+
+    return result;
+  }
 
 //create list of games for gamePlayer and the scores he/she got
   function createGamesList(data) {
       var text = "<ul> <font size='5'> Games and Scores:</font></br>";
 
       for (var i = 0; i < data.games.length; i++) {
-          var doc = document
-          var date = (new Date(data.games[i].game_created + (60*60*1000*i)));
-
-          for (var j=0; j< data.games[i].gamePlayers.length ; j++) {//need to clean this up so game date is only listed once
-//          for each set of gamePlayers/scores
-              if (data.player.name == data.games[i].gamePlayers[j].player_email){ //add link to game for gp
-                 text += "<li> <a href='game.html?gp=" + data.games[i].gamePlayers[j].gamePlayer_id +"'>"
+      var doc = document
+      var date = (new Date(data.games[i].game_created + (60*60*1000*i)));
+      id = gameLinkId(data.games[i], data.player.id);
+          if(id != null){
+             text += "<li> <a href='game.html?gp=" + id +"'>"
                           + "Game</a> Started on:   " + date;
-              }
-              else {
-                 text += "<li> Game Started on:   " + date;
-              }
+          }
+          else{
+             text += "<li> Game Started on:   " + date;
+          }
 
-              if (data.games[i].gamePlayers[j].score.length != 0){ //check that score isn't empty
-                 text +=      "<ul><li>Player:  " + data.games[i].gamePlayers[j].player_email
-                            + ",    Score:   "
-                            + data.games[i].gamePlayers[j].score[0] + "</li></ul>" +
-                            "</li>";
+          for (var j=0; j< data.games[i].gamePlayers.length ; j++) {
+              if(data.games[i].gamePlayers[j].score != null){//game has score
+                    text += "<ul><li>Player:  " + data.games[i].gamePlayers[j].player_email
+                                + ",  Game Score:   " + data.games[i].gamePlayers[j].score + "</li></ul></li>";
               }
-              else { //if no score posted yet
-
-                  if (data.games[i].gamePlayers.length < 2){
+              else if (data.games[i].gamePlayers[j].score == null) {//no score yet
+                  if (data.games[i].gamePlayers.length < 2){ //game doesn't have both players already
                       text += '<ul><li>Player:    ' + data.games[i].gamePlayers[j].player_email +
-                              ' <button id="join_game">Join Game</button>  </li></ul>';
+                              ' <button id="join_game">Join Game</button>  </li></ul></li>';
                   }
-                  else if (data.games[i].gamePlayers.length == 2){
+                  else if (data.games[i].gamePlayers.length == 2){ //game has both players already
                       text += '<ul><li>Player:    ' + data.games[i].gamePlayers[j].player_email +
-                              '    Score: N/A (Game still in play)  </li></ul>';
+                              '    Score: N/A (Game still in play)  </li></ul></li>';
                   }
               }
           }
       }
+
       text += "</ul>";
       document.getElementById("games_list").innerHTML = text;
 
-    }
+  }
 
-    //LeaderBoard for gamePlayer tallies (specific player or all depending on if signed in)
+    //LeaderBoard for gamePlayer tallies
     function leaderBoardCreate(data) {
              var body = document.getElementsByTagName('div')[0];
              var tbl = document.createElement('table');
              tbl.setAttribute('border', '1');
              tbl.setAttribute('text-align', 'center');
              var tbdy = document.createElement('tbody');
-             if (data.player){ //get player info if player logged in
-                var emails = getOpponentPlayerEmails(data); //gets logged in player email and opponents of that player
-                var length = emails.length + 1;
-             }
-             else { //if player isn't signed in, show all games' scores
-                var emails = getEmails(data);
-                var length = emails.length + 1;//make table as long as number of unique emails + 1 for headers
-             }
+             var emails = getEmails(data);
+             var length = emails.length + 1;//make table as long as number of unique emails + 1 for headers
+
              for (var i = 0; i < length; i++) {
                  var tr = document.createElement('tr');
                  for (var j = 0; j < 5; j++) {
@@ -193,8 +196,8 @@ $(document).ready(function(){
         //create array of scores for each player
         for (i=0; i < data.games.length; i++) { //say games.length undefined but console.log can find it...?
             for (j=0; j < data.games[i].gamePlayers.length; j++){
-                if (data.games[i].gamePlayers[j].player_email == email && data.games[i].gamePlayers[j].score[0]){
-                    arr.push(data.games[i].gamePlayers[j].score[0]) //collect scores per email
+                if (data.games[i].gamePlayers[j].player_email == email && data.games[i].gamePlayers[j].score){
+                    arr.push(data.games[i].gamePlayers[j].score) //collect scores per email
                 }
             }
         }
@@ -210,7 +213,7 @@ $(document).ready(function(){
         for (i=0; i < data.games.length; i++) {
             for (j=0; j< data.games[i].gamePlayers.length; j++){
                 if (data.games[i].gamePlayers[j].player_email == email){
-                    if (data.games[i].gamePlayers[j].score[0] === 1){
+                    if (data.games[i].gamePlayers[j].score === 1){
                                     count++;
                     }
                 }
@@ -224,7 +227,7 @@ $(document).ready(function(){
         for (i=0; i < data.games.length; i++) {
             for (j=0; j< data.games[i].gamePlayers.length; j++){
                 if (data.games[i].gamePlayers[j].player_email == email){
-                    if (data.games[i].gamePlayers[j].score[0] === 0.5){
+                    if (data.games[i].gamePlayers[j].score === 0.5){
                                     count++;
                     }
                 }
@@ -239,7 +242,7 @@ $(document).ready(function(){
         for (i=0; i < data.games.length; i++) {
             for (j=0; j< data.games[i].gamePlayers.length; j++){
                 if (data.games[i].gamePlayers[j].player_email == email){
-                    if (data.games[i].gamePlayers[j].score[0] === 0){
+                    if (data.games[i].gamePlayers[j].score === 0){
                                     count++;
                     }
                 }
