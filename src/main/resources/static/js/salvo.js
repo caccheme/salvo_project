@@ -10,49 +10,41 @@ $(document).ready(function(){
          }
       });//end of ajax
 
-//create list of games for gamePlayer and the scores he/she got
-  function createGamesList(data) {
-      var text = "<ul> <font size='5'> Games and Scores:</font></br>";
+ //for games.html no 'join game', and checks to see if anyone signed in, included in the below logic
+    //create list of games for gamePlayer and the scores he/she got
+      function createGamesList(data) {
+          var text = "<ul> <font size='5'> Games and Scores:</font></br>";
 
-      for (var i = 0; i < data.games.length; i++) {
+          for (var i = 0; i < data.games.length; i++) {
           var doc = document
           var date = (new Date(data.games[i].game_created + (60*60*1000*i)));
-          for (var j=0; j< data.games[i].gamePlayers.length ; j++) {
-                if (data.games[i].gamePlayers[j].score != 0){ //check that score isn't empty
-                    text += "<li> Game Started on:  " + date +
-                                  "<ul><li>Player:  " + data.games[i].gamePlayers[j].player_email
-                                  + "</li><li>  Game Score:   "
-                                  + data.games[i].gamePlayers[j].score + "</ul></li>" +
-                                  "</li>";
-                }
-                else { //if no score posted yet
-                    text += "<li> Game Started on:  " + date +
-                                                      "<ul><li>Player:  " + data.games[i].gamePlayers[j].player_email
-                                                      + "</li><li>  Game Score: No score yet </ul></li>" +
-                                                      "</li>";
-                }
+              text += "<li> Game Started on:   " + date;
+              for (var j=0; j< data.games[i].gamePlayers.length ; j++) {
+                  if(data.games[i].gamePlayers[j].score != null){//game has score
+                        text += "<ul><li>Player:  " + data.games[i].gamePlayers[j].player_email
+                                    + ",  Game Score:   " + data.games[i].gamePlayers[j].score + "</li></ul></li>";
+                  }
+                  else if (data.games[i].gamePlayers[j].score == null) {//no score yet
+                        text += '<ul><li>Player:    ' + data.games[i].gamePlayers[j].player_email
+                                    + '    Score: N/A (Game still in play)  </li></ul></li>';
+                  }
+              }
           }
+          text += "</ul>";
+          document.getElementById("games_list").innerHTML = text;
+
       }
-      text += "</ul>";
-      document.getElementById("games_list").innerHTML = text;
 
-    }
-
-    //LeaderBoard for gamePlayer tallies (specific player or all depending on if signed in)
+    //LeaderBoard for gamePlayer tallies
     function leaderBoardCreate(data) {
              var body = document.getElementsByTagName('div')[0];
              var tbl = document.createElement('table');
              tbl.setAttribute('border', '1');
              tbl.setAttribute('text-align', 'center');
              var tbdy = document.createElement('tbody');
-             if (data.player){ //get player info if player logged in
-                var emails = getOpponentPlayerEmails(data); //gets logged in player email and opponents of that player
-                var length = emails.length + 1;
-             }
-             else { //if player isn't signed in, show all games' scores
-                var emails = getEmails(data);
-                var length = emails.length + 1;//make table as long as number of unique emails + 1 for headers
-             }
+             var emails = getEmails(data);
+             var length = emails.length + 1;//make table as long as number of unique emails + 1 for headers
+
              for (var i = 0; i < length; i++) {
                  var tr = document.createElement('tr');
                  for (var j = 0; j < 5; j++) {
@@ -142,30 +134,6 @@ $(document).ready(function(){
         return uniqueNames; //["j.bauer@ctu.gov", "c.obrian@ctu.gov", "t.almeida@ctu.gov", "palmer@whitehouse.gov"]
     }
 
-    function getOpponentPlayerEmails(data){
-        var arr = [];
-        var currentUser = data.player.name
-        arr.push(currentUser);
-
-        //create array of player email and player's opponent emails only, will have duplicates
-        for (i=0; i< data.games.length; i++) {
-            for (j=0; j< data.games[i].gamePlayers.length; j++){
-                if (currentUser = data.games[i].gamePlayers[j].player_email && data.games[i].gamePlayers[j+1]){
-                    if (data.games[i].gamePlayers[j].score[0] == 1 || data.games[i].gamePlayers[j].score[0] == 0
-                            || data.games[i].gamePlayers[j].score[0] == 0.5){//only games with scores
-                       arr.push(data.games[i].gamePlayers[j].player_email);
-                    }
-                }
-            }
-        }
-
-        var uniqueNames = [];
-        $.each(arr, function(i, el){
-            if($.inArray(el, uniqueNames) === -1) uniqueNames.push(el);
-        });
-        return uniqueNames;
-    }
-
     function getAllScores(data, emails){
         var scores = [];
         for (var i=0; i< emails.length; i++){
@@ -179,8 +147,8 @@ $(document).ready(function(){
         //create array of scores for each player
         for (i=0; i < data.games.length; i++) { //say games.length undefined but console.log can find it...?
             for (j=0; j < data.games[i].gamePlayers.length; j++){
-                if (data.games[i].gamePlayers[j].player_email == email && data.games[i].gamePlayers[j].score[0]){
-                    arr.push(data.games[i].gamePlayers[j].score[0]) //collect scores per email
+                if (data.games[i].gamePlayers[j].player_email == email && data.games[i].gamePlayers[j].score){
+                    arr.push(data.games[i].gamePlayers[j].score) //collect scores per email
                 }
             }
         }
@@ -196,7 +164,7 @@ $(document).ready(function(){
         for (i=0; i < data.games.length; i++) {
             for (j=0; j< data.games[i].gamePlayers.length; j++){
                 if (data.games[i].gamePlayers[j].player_email == email){
-                    if (data.games[i].gamePlayers[j].score[0] === 1){
+                    if (data.games[i].gamePlayers[j].score === 1){
                                     count++;
                     }
                 }
@@ -210,7 +178,7 @@ $(document).ready(function(){
         for (i=0; i < data.games.length; i++) {
             for (j=0; j< data.games[i].gamePlayers.length; j++){
                 if (data.games[i].gamePlayers[j].player_email == email){
-                    if (data.games[i].gamePlayers[j].score[0] === 0.5){
+                    if (data.games[i].gamePlayers[j].score === 0.5){
                                     count++;
                     }
                 }
@@ -225,7 +193,7 @@ $(document).ready(function(){
         for (i=0; i < data.games.length; i++) {
             for (j=0; j< data.games[i].gamePlayers.length; j++){
                 if (data.games[i].gamePlayers[j].player_email == email){
-                    if (data.games[i].gamePlayers[j].score[0] === 0){
+                    if (data.games[i].gamePlayers[j].score === 0){
                                     count++;
                     }
                 }
