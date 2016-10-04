@@ -153,17 +153,14 @@ class WebSecurityConfiguration extends GlobalAuthenticationConfigurerAdapter {
 	}
 }
 
-
-
 @Configuration
 @EnableWebSecurity
 class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 		http.authorizeRequests()
-				//allow access to index.html and games.html when not logged in
-				.antMatchers("/js/app.js", "/index.html","/css/app.css" ,
-						"/games.html","/api/games", "/js/salvo.js").permitAll()
+				//allow access to games.html when not logged in
+				.antMatchers("/games.html","/api/games", "/js/games.js").permitAll()
 				.anyRequest().authenticated()
 				.and()
 				.formLogin();
