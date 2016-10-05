@@ -102,15 +102,6 @@ public class SalvoController {
                 return result;
         }
 
-        //this will be called when this is a 'get' not a 'post'
-        //go to ebook about request mappings, mapping for a post is what we want here
-        //in section on sending data, give extra arguments
-        //The URL + method that define the request mapping (so can have api/games 'post' and api/games 'get')
-        //****so need to update task 2 to read api/games (not api/game)
-        //
-
-
-
         private ResponseEntity<Map<String, Object>> makeResponse (Map<String, Object> dto, HttpStatus status){
                 ResponseEntity result = new ResponseEntity(dto, status);
 

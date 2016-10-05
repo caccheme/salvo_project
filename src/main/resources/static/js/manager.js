@@ -19,7 +19,6 @@ $(document).ready(function(){
             .done(function (data, status, jqXHR) {
               alert( "Game Created for gp with id: " + data.gpid );
               location.href = "game.html?gp=" + data.gpid ;
-              console.log(data);
             })
             .fail(function (jqXHR, status, httpError) {
               alert("Error: " + status + " " + httpError);

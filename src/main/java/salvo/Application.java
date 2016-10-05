@@ -163,7 +163,7 @@ class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 				.authorizeRequests()
 				//allow access to games.html when not logged in
 				.antMatchers("/games.html","/api/games", "/js/games.js").permitAll()
-				.anyRequest().authenticated() //could this through 403 error when trying to POST to api/games???
+				.anyRequest().authenticated()
 				.and()
 				.formLogin();
 	}
