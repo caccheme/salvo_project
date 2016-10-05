@@ -158,10 +158,12 @@ class WebSecurityConfiguration extends GlobalAuthenticationConfigurerAdapter {
 class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
-		http.authorizeRequests()
+		http
+				.csrf().disable()
+				.authorizeRequests()
 				//allow access to games.html when not logged in
 				.antMatchers("/games.html","/api/games", "/js/games.js").permitAll()
-				.anyRequest().authenticated()
+				.anyRequest().authenticated() //could this through 403 error when trying to POST to api/games???
 				.and()
 				.formLogin();
 	}

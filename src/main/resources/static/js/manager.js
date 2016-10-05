@@ -7,8 +7,24 @@ $(document).ready(function(){
                         createGamesList(data);
                         leaderBoardCreate(data);
                         console.log(data);
+
          }
       });//end of ajax
+
+    $('#create_game').on("click", function(){
+         $.post({
+              url: "/api/games",
+              dataType: "json"
+            })
+            .done(function (data, status, jqXHR) {
+              alert( "Game Created for gp with id: " + data.gpid );
+              location.href = "game.html?gp=" + data.gpid ;
+              console.log(data);
+            })
+            .fail(function (jqXHR, status, httpError) {
+              alert("Error: " + status + " " + httpError);
+            })
+    });
 
   function gameLinkId(game, player_id) {
     result = null;

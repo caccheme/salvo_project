@@ -9,6 +9,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import salvo.model.*;
 
@@ -31,7 +32,7 @@ public class SalvoController {
         @Autowired
         private PlayerRepository playerRepository;
 
-        @RequestMapping("/games")
+        @RequestMapping(value = "/games", method = RequestMethod.GET)
         public Map<String, Object> getGames() {
                 Map<String, Object> dto = new LinkedHashMap<>();
 
@@ -45,6 +46,28 @@ public class SalvoController {
                 }
                 dto.put("games", getAllGames());
                 return dto;
+        }
+
+        @RequestMapping(value = "/games", method= RequestMethod.POST) //game created with a POST to /api/games.
+        public ResponseEntity<Map<String, Object>> createGame() {
+                Map<String, Object> dto = new LinkedHashMap<>();
+                ResponseEntity result;
+
+                String name = getCurrentUsername();// gets the current user
+                Player currentUser = playerRepository.findOneByEmail(name);
+                if (name == null){ //if there is no current user:
+                        result = makeResponse(null, HttpStatus.UNAUTHORIZED);// send unauthorized response
+                }
+                else { //if there is a current user:
+                        Game newGame = repo.save(new Game()); //create & save a new game & gamePlayer for currentUser
+                        GamePlayer newGamePlayer = gp_repository.save(new GamePlayer(newGame, currentUser));
+
+                        dto.put("gpid", newGamePlayer.getId()); //create JSON containing new gamePlayer ID
+
+                        result = makeResponse(dto, HttpStatus.OK);
+
+                }
+                return result;
         }
 
         @RequestMapping("/game_view/{gamePlayer_Id}")
@@ -78,6 +101,15 @@ public class SalvoController {
 
                 return result;
         }
+
+        //this will be called when this is a 'get' not a 'post'
+        //go to ebook about request mappings, mapping for a post is what we want here
+        //in section on sending data, give extra arguments
+        //The URL + method that define the request mapping (so can have api/games 'post' and api/games 'get')
+        //****so need to update task 2 to read api/games (not api/game)
+        //
+
+
 
         private ResponseEntity<Map<String, Object>> makeResponse (Map<String, Object> dto, HttpStatus status){
                 ResponseEntity result = new ResponseEntity(dto, status);
