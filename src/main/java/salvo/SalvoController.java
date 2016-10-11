@@ -7,10 +7,7 @@ import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import salvo.model.*;
 
 import java.util.*;
@@ -68,6 +65,19 @@ public class SalvoController {
 
                 }
                 return result;
+        }
+
+        @RequestMapping(value="/players/{email}/{password}", method=RequestMethod.POST)
+        public ResponseEntity<Map<String, Object>> createUser(@PathVariable String email,
+                                                              @PathVariable String password) {
+                Map<String, Object> dto = new LinkedHashMap<>();
+
+                Player player = new Player(email, password);
+                playerRepository.save(player);
+
+                dto.put("email", player.getEmail());
+                dto.put("password", player.getPassword());
+                return makeResponse(dto, HttpStatus.OK);
         }
 
         @RequestMapping("/game_view/{gamePlayer_Id}")

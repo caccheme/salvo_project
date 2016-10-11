@@ -162,7 +162,8 @@ class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 				.csrf().disable()
 				.authorizeRequests()
 				//allow access to games.html when not logged in
-				.antMatchers("/games.html","/api/games", "/js/games.js").permitAll()
+				.antMatchers("/games.html","/api/games", "/js/games.js",
+								"/signup.html*","/api/players/**" , "/js/signup.js").permitAll()
 				.anyRequest().authenticated()
 				.and()
 				.formLogin();
