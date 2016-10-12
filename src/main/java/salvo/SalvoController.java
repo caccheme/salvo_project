@@ -67,6 +67,41 @@ public class SalvoController {
                 return result;
         }
 
+        @RequestMapping(value = "/game/{game_id}/players", method= RequestMethod.POST) //join game with a POST
+        public ResponseEntity<Map<String, Object>> joinGame(@PathVariable Long game_id) {
+                Map<String, Object> dto = new LinkedHashMap<>();
+                ResponseEntity result = new ResponseEntity(null, null);
+
+                String name = getCurrentUsername();// gets the current user
+                Player currentUser = playerRepository.findOneByEmail(name);
+                Game game = repo.findOne(game_id);
+
+                if (name == null){ //if there is no current user:
+                        result = makeResponse(null, HttpStatus.UNAUTHORIZED);// send unauthorized response
+                }
+                else{ //if there is a current user:
+                        if (game == null){ //game doesn't exist
+                                dto.put("text", "No such game");
+                                result = makeResponse(dto, HttpStatus.FORBIDDEN);
+                        }
+                        else { //game exists     //
+                                if (game.getPlayers().toArray().length < 2 //game has less than two players
+                                        && game.getPlayers().contains(currentUser) != true){ //user not already part of game
+                                        GamePlayer newGamePlayer = gp_repository.save(new GamePlayer(game, currentUser));
+                                        dto.put("gpid", newGamePlayer.getId());
+
+                                        result = makeResponse(dto, HttpStatus.OK);
+                                }
+                                else { //game full
+                                        dto.put("text", "Game is full.");
+                                        result = makeResponse(dto, HttpStatus.FORBIDDEN);
+                                }
+                        }
+                }
+                return result;
+        }
+
+
         @RequestMapping(value="/players/{email}/{password}", method=RequestMethod.POST)
         public ResponseEntity<Map<String, Object>> createUser(@PathVariable String email,
                                                               @PathVariable String password) {

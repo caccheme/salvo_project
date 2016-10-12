@@ -59,8 +59,10 @@ $(document).ready(function(){
               }
               else if (data.games[i].gamePlayers[j].score == null) {//no score yet
                   if (data.games[i].gamePlayers.length < 2){ //game doesn't have both players already
-                      text += '<ul><li>Player:    ' + data.games[i].gamePlayers[j].player_email +
-                              ' <button id="join_game">Join Game</button>  </li></ul></li>';
+                      text += '<ul><li>Player:    ' + data.games[i].gamePlayers[j].player_email
+                              + ' <button id="join_game" value="'+ data.games[i].game_id
+                              + '" onClick="myFunction('+ data.games[i].game_id
+                              +')">Join Game</button>  </li></ul></li>';
                   }
                   else if (data.games[i].gamePlayers.length == 2){ //game has both players already
                       text += '<ul><li>Player:    ' + data.games[i].gamePlayers[j].player_email +
@@ -243,3 +245,6 @@ $(document).ready(function(){
     }
 
 });
+
+
+

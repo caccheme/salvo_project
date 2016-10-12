@@ -17,5 +17,21 @@
 
 <script src="/js/manager.js"></script>
 
+<script>
+        function myFunction(val) {
+             var game_id = val;
+             $.post({
+                  url: "/api/game/"+ game_id + "/players",
+                  dataType: "json"
+                })
+                .done(function (data, status, jqXHR) {
+                  alert( "Game Created for gp with id: " + data.gpid );
+                  location.href = "game.html?gp=" + data.gpid ;
+                })
+                .fail(function (jqXHR, status, httpError) {
+                  alert("Error: " + status + " " + httpError);
+                })
+        }
+</script>
 </body>
 </html>
