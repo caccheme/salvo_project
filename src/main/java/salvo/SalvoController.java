@@ -28,6 +28,8 @@ public class SalvoController {
         private GamePlayerRepository gp_repository;
         @Autowired
         private PlayerRepository playerRepository;
+        @Autowired
+        private ShipRepository shipRepository;
 
         @RequestMapping(value = "/games", method = RequestMethod.GET)
         public Map<String, Object> getGames() {
@@ -142,6 +144,49 @@ public class SalvoController {
                         dto.put("main_player_ships", collectShipData(gamePlayer.getShips()));
 
                         result = makeResponse(dto, HttpStatus.OK);
+                }
+
+                return result;
+        }
+
+//        Required request body is missing:
+// public org.springframework.http.ResponseEntity<java.util.Map<java.lang.String, java.lang.Object>>
+// salvo.SalvoController.placeGamePlayerShips(java.lang.Long,salvo.model.Ship)
+
+        @RequestMapping("/games/players/{gamePlayer_Id}/ships")
+        public ResponseEntity<Map<String, Object>> placeGamePlayerShips(@PathVariable Long gamePlayer_Id,
+                                                                        @RequestBody List<Ship> ships) {
+                Map<String, Object> dto = new LinkedHashMap<>();
+                ResponseEntity result = new ResponseEntity(null, null);
+
+                GamePlayer gamePlayer = gp_repository.findOne(gamePlayer_Id);
+                String currentPlayer = getCurrentUsername();
+                Player player = playerRepository.findOneByEmail(currentPlayer);
+
+                //no current user logged in OR no gamePlayer with given ID OR
+                //the current user is not the game player the ID references
+                // then unauthorized:
+                if (player == null || gp_repository.findOne(gamePlayer_Id) == null ||
+                        player != gp_repository.findOne(gamePlayer_Id).getPlayer())
+                {
+                        result = makeResponse(null, HttpStatus.UNAUTHORIZED);
+                }
+
+                //A Forbidden response should be sent if the user already has all ships placed.
+                if (gamePlayer.getShips().toArray().length == 5){
+                        result = makeResponse(null, HttpStatus.FORBIDDEN);
+                }
+
+                //else of above two...
+                if (player != null && gp_repository.findOne(gamePlayer_Id) != null &&
+                        player == gp_repository.findOne(gamePlayer_Id).getPlayer()
+                        && gamePlayer.getShips().toArray().length < 5)
+                {
+                        ships.iterator().forEachRemaining(s -> s.setGamePlayer(gamePlayer));
+                        ships.iterator().forEachRemaining(s -> shipRepository.save(s));
+                        dto.put("ships", collectShipData(gamePlayer.getShips()));
+
+                        result = makeResponse(dto, HttpStatus.CREATED);
                 }
 
                 return result;

@@ -28,6 +28,21 @@ $(document).ready(function(){
         }
   });//end ajax
 
+     //post the JSON string for a list of ships to controller
+      $.post({
+              url: "/api/games/players/" + gamePlayer_Id + "/ships",
+              dataType: "json",
+              contentType: "application/json",
+              data: JSON.stringify([{ "shipType": "destroyer", "shipLocations": ["A1", "B1", "C1"] },
+                                     { "shipType": "patrol boat", "shipLocations": ["H5", "H6"] }]),
+          })
+          .done(function (data, status, jqXHR) {
+              console.log(data);
+          })
+          .fail(function (jqXHR, status, httpError) {
+              alert("Error: " + status + " " + httpError);
+          });
+
 //show player email on page
       function showPlayerEmail(data) {
              $("#player_email").text("Welcome, "+ data.main_player + "!");
