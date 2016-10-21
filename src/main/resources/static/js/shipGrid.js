@@ -23,10 +23,13 @@ $(document).ready(function(){
                    tableCreate1(data);
                    tableCreate2(data);
                    showPlayerEmail(data);
+
                 console.log(data);
 
         }
   });//end ajax
+
+
 
      //post the JSON string for a list of ships to controller
       $.post({
@@ -47,6 +50,7 @@ $(document).ready(function(){
       function showPlayerEmail(data) {
              $("#player_email").text("Welcome, "+ data.main_player + "!");
       }
+
 //create and fill ship grid, mark where opponent has hit ships
      function tableCreate1(data) {
          var body = document.getElementsByTagName('div')[1];
@@ -102,7 +106,176 @@ $(document).ready(function(){
              tbdy.appendChild(tr);
          }
          tbl.appendChild(tbdy);
-         body.appendChild(tbl)
+         body.appendChild(tbl);
+         clickableTable();
+     }
+
+     var finalArray = [];
+     function clickableTable() {
+
+            var tempArray = [];
+            var cellArray = [];
+            var rowArray = [];
+            var table = document.getElementById("ship_table");
+            var cells = table.getElementsByTagName("td"); //Uncaught TypeError: Cannot read property 'getElementsByTag' of null
+
+            for(var i = 1; i < cells.length; i++){
+              // Cell Object
+              var cell = cells[i];
+              // Track with onclick
+              cell.onclick = function(){
+                 incrementCount();
+                 var alphaArray = [" ", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J"]; //so jArray[1] should = "A", etc
+
+                  var cellIndex = this.cellIndex; //check that click is not the same as previous ship location or click
+                  var cellLetter  = alphaArray[cellIndex];
+                  var rowIndex = this.parentNode.rowIndex;
+                  var newLocation = cellLetter + rowIndex
+
+                  tempArray.push(newLocation);
+                  cellArray.push(cellIndex);
+                  rowArray.push(rowIndex);
+
+                  if (count == 2) { //find length of ship after two clicks
+                        count = 0;//reset the count to zero again...
+                        var cellDiff = calculateDifference(cellArray[0], cellArray[1]);
+                        var rowDiff = calculateDifference(rowArray[0], rowArray[1]);
+
+                        if (checkIfDiagonal(cellDiff, rowDiff) == false){
+                            var shipLength = cellDiff + rowDiff;
+                            var shipType = findShipType(shipLength);
+                            if (shipType != false){
+                                finalArray.push({"type": shipType, "locations": tempArray});
+                            }
+                            console.log("shipLength is: " + shipLength)
+                            console.log(finalArray);
+                            tempArray = [];//reset tempArray after each set of two clicks
+                        }
+                        else{
+                            alert("This is a diagonal placement. Please choose either a vertical or horizontal ship placement on the grid.");
+                            tempArray = [];
+                        }
+
+                        cellArray = []; //reset the array after each two clicks
+                        rowArray = []; //reset the array after each two clicks
+
+                  }
+              }
+            }
+      }
+
+    //this function checks for multiples, and also if size valid before sending shipType to final array,
+    //if not valid size or is a duplicate of a ship already placed, the new ship is not put in array
+     function findShipType(shipLength){
+        if (finalArray.length == 0){
+            if (shipLength == 2){
+                return "patrol boat";
+            }
+            if (shipLength == 3) {
+                return "destroyer";
+            }
+            if (shipLength == 4) {
+                return "battleship";
+            }
+            if (shipLength == 5) {
+                return "carrier";
+            }
+            if (shipLength > 5) {
+                alert("Invalid ship size.")
+                return false;
+            }
+        }
+        else{
+            var numPatrolBoats = finalArray.reduce(function(n, ship) { //DRY up these num... variables
+                return n + (ship.type == 'patrol boat');
+            }, 0);
+
+            var numDestroyers = finalArray.reduce(function(n, ship) {
+                return n + (ship.type == 'destroyer');
+            }, 0);
+
+            var numSubmarines = finalArray.reduce(function(n, ship) {
+                return n + (ship.type == 'submarine');
+            }, 0);
+
+            var numBattleships = finalArray.reduce(function(n, ship) {
+                return n + (ship.type == 'battleship');
+            }, 0);
+
+            var numCarriers = finalArray.reduce(function(n, ship) {
+                return n + (ship.type == 'carrier');
+            }, 0);
+
+                if (shipLength == 2){
+                    if (numPatrolBoats == 0){
+                       return "patrol boat";
+                    }
+                    else{
+                       alert("Invalid ship size. You have already placed your patrol boat.");
+                       return false;
+                    }
+                }
+                if (shipLength == 3){
+                    if (numDestroyers == 0){
+                        return "destroyer";
+                    }
+                    if (numDestroyers == 1 && numSubmarines === 0){
+                        return "submarine";
+                    }
+                    if (numDestroyers == 1 && numSubmarines == 1){
+                        alert("Invalid ship size.  You have already placed both ships of this size");
+                        return false;
+                    }
+                }
+                if (shipLength == 4){
+                    if (numBattleships == 0){
+                       return "battleship";
+                    }
+                    else{
+                       alert("Invalid ship size. You have already placed your battleship.");
+                       return false;
+                    }
+                }
+                if (shipLength == 5){
+                    if (numCarriers == 0){
+                       return "carrier";
+                    }
+                    else{
+                       alert("Invalid ship size. You have already placed your carrier.");
+                       return false;
+                    }
+                }
+                if (shipLength > 5 || shipLength <= 1 ) {
+                    alert("Invalid ship size.")
+                    return false;
+                }
+        }
+     }
+
+     function checkIfDiagonal(cellDiff, rowDiff) {
+           if (cellDiff != 0 && rowDiff != 0){//then they clicked diagonally
+                return true;
+           }
+           else{
+                return false;
+           }
+     }
+
+     var count = 0;
+      // function to increment value of count variable
+     function incrementCount() {
+        count++;
+        return count;
+     }
+
+     function calculateDifference(a, b){
+        var val = Math.abs(a - b); //get abs difference
+        if (val == 0){
+            return 0;
+        }
+        else { //if not the same then add one to get correct length of ship
+            return val + 1;
+        }
      }
 
      function getShipLocations(data) {
