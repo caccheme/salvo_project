@@ -17,19 +17,20 @@ $(document).ready(function(){
         var cannedData = [ { "type": "destroyer", "locations": ["A1", "B1", "C1"] },
                   { "type": "patrol boat", "locations": ["H5", "H6"] } ]
 
+//this whole thing is going to go into shipGrid.js eventually...was in ship.js to test but will be removed once get shipGrid.js logic working
     //post the JSON string for a list of ships to controller
-    $.post({
-            url: "/api/games/players/" + gamePlayer_Id + "/ships",
-            dataType: "json",
-            contentType: "application/json",
-            data: JSON.stringify([{ "shipType": "destroyer", "shipLocations": ["A1", "B1", "C1"] },
-                                   { "shipType": "patrol boat", "shipLocations": ["H5", "H6"] }]),
-        })
-        .done(function (data, status, jqXHR) {
-            console.log(data);
-        })
-        .fail(function (jqXHR, status, httpError) {
-            alert("Error: " + status + " " + httpError);
-        });
+//    $.post({
+//            url: "/api/games/players/" + gamePlayer_Id + "/ships",
+//            dataType: "json",
+//            contentType: "application/json",
+//            data: JSON.stringify([{ "shipType": "destroyer", "shipLocations": ["A1", "B1", "C1"] },
+//                                   { "shipType": "patrol boat", "shipLocations": ["H5", "H6"] }]),
+//        })
+//        .done(function (data, status, jqXHR) {
+//            console.log(data);
+//        })
+//        .fail(function (jqXHR, status, httpError) {
+//            alert("Error: " + status + " " + httpError);
+//        });
 
 });

@@ -30,21 +30,21 @@ $(document).ready(function(){
   });//end ajax
 
 
-
-     //post the JSON string for a list of ships to controller
-      $.post({
-              url: "/api/games/players/" + gamePlayer_Id + "/ships",
-              dataType: "json",
-              contentType: "application/json",
-              data: JSON.stringify([{ "shipType": "destroyer", "shipLocations": ["A1", "B1", "C1"] },
-                                     { "shipType": "patrol boat", "shipLocations": ["H5", "H6"] }]),
-          })
-          .done(function (data, status, jqXHR) {
-              console.log(data);
-          })
-          .fail(function (jqXHR, status, httpError) {
-              alert("Error: " + status + " " + httpError);
-          });
+//uncomment this when ship placement is final...this will be called when the user submits the full finalArray of the ships
+//     //post the JSON string for a list of ships to controller
+//      $.post({
+//              url: "/api/games/players/" + gamePlayer_Id + "/ships",
+//              dataType: "json",
+//              contentType: "application/json",
+//              data: JSON.stringify([{ "shipType": "destroyer", "shipLocations": ["A1", "B1", "C1"] },
+//                                     { "shipType": "patrol boat", "shipLocations": ["H5", "H6"] }]),
+//          })
+//          .done(function (data, status, jqXHR) {
+//              console.log(data);
+//          })
+//          .fail(function (jqXHR, status, httpError) {
+//              alert("Error: " + status + " " + httpError);
+//          });
 
 //show player email on page
       function showPlayerEmail(data) {
@@ -91,14 +91,25 @@ $(document).ready(function(){
                     var cellString = myConcatFunction(j,i);
 
                     //  loop over rest of grid, check for player ships, mark matching locations blue
-                    if (checkLocations(getShipLocations(data), cellString) == true) {
-                       td.style.backgroundColor = "blue"
-                       // check if opponent has hit any ships, mark hit locations red
-                       if (td.style.backgroundColor == "blue" && checkLocations(getOpponentSalvoData(data), cellString) == true) {
-                         td.style.backgroundColor = "red"
-                         td.appendChild(document.createTextNode(getOpponentTurnNumber(data, cellString)));
-                       }
-                    }
+
+                        if (checkLocations(getShipLocations(data), cellString) == true) {
+                               td.style.backgroundColor = "blue"
+                               // check if opponent has hit any ships, mark hit locations red
+                               if (data.gamePlayers){
+                                    if (td.style.backgroundColor == "blue" && checkLocations(getOpponentSalvoData(data), cellString) == true) {
+                                        td.style.backgroundColor = "red"
+                                        td.appendChild(document.createTextNode(getOpponentTurnNumber(data, cellString)));
+                                   }
+                               }
+
+//                               if (checkLocations(getShipLocations(finalArray)), cellString == true){
+//                                     td.style.backgroundColor="grey"; //add temporary shading when selecting ships
+//
+//                               }
+                        }
+
+
+                    //check for finalArray stuff here....
 
                     tr.appendChild(td)
                  }
@@ -112,10 +123,11 @@ $(document).ready(function(){
 
      var finalArray = [];
      function clickableTable() {
-
             var tempArray = [];
             var cellArray = [];
+            var cellLettersArray=[];
             var rowArray = [];
+            var allLocations = [];
             var table = document.getElementById("ship_table");
             var cells = table.getElementsByTagName("td"); //Uncaught TypeError: Cannot read property 'getElementsByTag' of null
 
@@ -127,39 +139,97 @@ $(document).ready(function(){
                  incrementCount();
                  var alphaArray = [" ", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J"]; //so jArray[1] should = "A", etc
 
-                  var cellIndex = this.cellIndex; //check that click is not the same as previous ship location or click
+                  var cellIndex = this.cellIndex;
                   var cellLetter  = alphaArray[cellIndex];
                   var rowIndex = this.parentNode.rowIndex;
-                  var newLocation = cellLetter + rowIndex
+                  var newLocation = cellLetter + rowIndex;
 
-                  tempArray.push(newLocation);
-                  cellArray.push(cellIndex);
-                  rowArray.push(rowIndex);
-
-                  if (count == 2) { //find length of ship after two clicks
-                        count = 0;//reset the count to zero again...
-                        var cellDiff = calculateDifference(cellArray[0], cellArray[1]);
-                        var rowDiff = calculateDifference(rowArray[0], rowArray[1]);
-
-                        if (checkIfDiagonal(cellDiff, rowDiff) == false){
-                            var shipLength = cellDiff + rowDiff;
-                            var shipType = findShipType(shipLength);
-                            if (shipType != false){
-                                finalArray.push({"type": shipType, "locations": tempArray});
-                            }
-                            console.log("shipLength is: " + shipLength)
-                            console.log(finalArray);
-                            tempArray = [];//reset tempArray after each set of two clicks
-                        }
-                        else{
-                            alert("This is a diagonal placement. Please choose either a vertical or horizontal ship placement on the grid.");
-                            tempArray = [];
-                        }
-
-                        cellArray = []; //reset the array after each two clicks
-                        rowArray = []; //reset the array after each two clicks
-
+                  //check to see if a click is the same as previous ship location or click
+                  for (var i=0; i < finalArray.length; i++){
+                     for (var j=0; j < finalArray[i].locations.length; j++){
+                         if (newLocation == finalArray[i].locations[j]){
+                               console.log(finalArray[i].locations[j] + " is the same as the click: " + newLocation);
+                               alert("This location is already being used by another ship.");//how to set up dialog to cancel old ship placement here?
+                               //how to now continue on to adding click info and ship info to final Array here with dialog decision
+                         }
+                         else{//click location not already used
+//                       //  need to have array with all ship shaded in locations, so that can see if they click on middle of another ship
+//                          kicks them out to the code below that creates the finalArray...
+                         }
+                     }
                   }
+
+                 cellArray.push(cellIndex);
+                 cellLettersArray.push(cellLetter);
+                 rowArray.push(rowIndex);
+
+////get the all ship selection locations into the tempArray
+                   if (cellLettersArray[0] != cellLettersArray[1]){//then it is horizontal
+                   //find the cellIndexes between, create new locations with same rowIndex, add to tempArray
+                        if (cellArray[0]<cellArray[1]){
+                            var lowEnd = cellArray[0];
+                            var highEnd = cellArray[1];
+                        }
+                        if (cellArray[0]>cellArray[1]){
+                            var lowEnd = cellArray[1];
+                            var highEnd = cellArray[0];
+                        }
+                        for (var i = lowEnd; i <= highEnd; i++) {
+                            newLocation = alphaArray[i]+rowIndex;
+                            tempArray.push(newLocation);
+                        }
+
+                   }
+                   if (cellLettersArray[0] == cellLettersArray[1]){ //then it is vertical
+                        //find the rowIndexes between, create new locations with same cellLetter, add to tempArray
+                        cellLetter = alphaArray[cellIndex];
+                        if (rowArray[0]<rowArray[1]){
+                            var lowEnd = rowArray[0];
+                            var highEnd = rowArray[1];
+                        }
+                        if (rowArray[0]>rowArray[1]){
+                            var lowEnd = rowArray[1];
+                            var highEnd = rowArray[0];
+                        }
+                        for (var i = lowEnd; i <= highEnd; i++) {
+                            newLocation = cellLetter+i;
+                            tempArray.push(newLocation);
+                        }
+                   }
+
+                 if (count == 2) { //find length of ship after two clicks
+                     count = 0;//reset the count to zero again...
+                     var cellDiff = calculateDifference(cellArray[0], cellArray[1]); //cellDiff is undefined????
+                     var rowDiff = calculateDifference(rowArray[0], rowArray[1]);
+
+                     if (checkIfDiagonal(cellDiff, rowDiff) == false){
+                         var shipLength = cellDiff + rowDiff;
+                         var shipType = findShipType(shipLength);
+                         if (shipType != false){
+                             finalArray.push({"type": shipType, "locations": tempArray});
+
+
+                     //redraw table to show where ships are being placed with each new selection
+                            var shipTable = document.getElementById("ship_table");
+                            if (shipTable) {shipTable.parentNode.removeChild(shipTable);}
+                            tableCreate1(finalArray); //redraw grid each time ship added
+                             //will need to clear finalArray after I send it to server...or make table logic so server data overrides finalArray data
+
+                             //make is so the grid is shaded in between these location here...
+                         }
+                         console.log("shipLength is: " + shipLength)
+                         console.log(finalArray);
+                         tempArray = [];//reset tempArray after each set of two clicks
+                     }
+                     else{
+                         alert("This is a diagonal placement. Please choose either a vertical or horizontal ship placement on the grid.");
+                         tempArray = [];
+                     }
+
+                     cellArray = []; //reset the array after each two clicks
+                     rowArray = []; //reset the array after each two clicks
+                 }
+
               }
             }
       }
@@ -279,14 +349,22 @@ $(document).ready(function(){
      }
 
      function getShipLocations(data) {
-           var newArray = [];
-           for (var i=0; i < data.main_player_ships.length; i++){
-                 for (var j=0; j < data.main_player_ships[i].locations.length; j++){
-                    newArray.push(data.main_player_ships[i].locations[j]);
-                 }
-           }
-
-           return newArray;
+          var newArray = [];
+          if (data.main_player_ships != null){
+              for (var i=0; i < data.main_player_ships.length; i++){
+                   for (var j=0; j < data.main_player_ships[i].locations.length; j++){ //.length of undefined error
+                      newArray.push(data.main_player_ships[i].locations[j]);
+                   }
+              }
+          }
+          else {
+             for (var i=0; i< data.length; i++){
+                for (var j=0; j<data[i].locations.length; j++){
+                    newArray.push(data[i].locations[j]);
+                }
+             }
+          }
+          return newArray;
      }
 
      function checkLocations(data, cellString){
