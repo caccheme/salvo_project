@@ -90,10 +90,10 @@ $(document).ready(function(){
                     var td = document.createElement('td');
                     var cellString = myConcatFunction(j,i);
 
-                    //  loop over rest of grid, check for player ships, mark matching locations blue
-
+                    //  loop over rest of grid, check for player ships, mark locations
                         if (checkLocations(getShipLocations(data), cellString) == true) {
-                               td.style.backgroundColor = "blue"
+                            if (data.main_player_ships != null){
+                                td.style.backgroundColor = "blue"
                                // check if opponent has hit any ships, mark hit locations red
                                if (data.gamePlayers){
                                     if (td.style.backgroundColor == "blue" && checkLocations(getOpponentSalvoData(data), cellString) == true) {
@@ -101,16 +101,12 @@ $(document).ready(function(){
                                         td.appendChild(document.createTextNode(getOpponentTurnNumber(data, cellString)));
                                    }
                                }
-
-//                               if (checkLocations(getShipLocations(finalArray)), cellString == true){
-//                                     td.style.backgroundColor="grey"; //add temporary shading when selecting ships
-//
-//                               }
+                            }
+                            else {
+                                //if ship is being placed it will be grey until it is in the server data
+                                td.style.backgroundColor = "grey"
+                            }
                         }
-
-
-                    //check for finalArray stuff here....
-
                     tr.appendChild(td)
                  }
              }
@@ -127,7 +123,6 @@ $(document).ready(function(){
             var cellArray = [];
             var cellLettersArray=[];
             var rowArray = [];
-            var allLocations = [];
             var table = document.getElementById("ship_table");
             var cells = table.getElementsByTagName("td"); //Uncaught TypeError: Cannot read property 'getElementsByTag' of null
 
