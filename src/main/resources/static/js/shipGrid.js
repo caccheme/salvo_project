@@ -20,9 +20,15 @@ $(document).ready(function(){
         url: '/api/game_view/'+ gamePlayer_Id,
         dataType: 'json',
         success: function(data, textStatus, jqXHR) {
-                   tableCreate1(data);
-                   tableCreate2(data);
+                   shipGridCreate(data);
                    showPlayerEmail(data);
+                   //only show salvo grid after ships placed
+                   if (data.main_player_ships.length != 0){
+                       salvoGridCreate(data);
+                       listPlacedShips(data);
+                       hideShipPlacementInstructions();
+                   }
+
 
                 console.log(data);
 
@@ -34,8 +40,13 @@ $(document).ready(function(){
              $("#player_email").text("Welcome, "+ data.main_player + "!");
       }
 
+      function hideShipPlacementInstructions() {
+            $("#instructions").hide();
+            $("#total_ships").hide();
+      }
+
 //create and fill ship grid, mark where opponent has hit ships
-     function tableCreate1(data) {
+     function shipGridCreate(data) {
          var body = document.getElementById('ship_grid');
          var tbl = document.createElement('table');
 //         tbl.style.width = '35%';
@@ -186,7 +197,7 @@ $(document).ready(function(){
                      //redraw table to show where ships are being placed with each new selection
                             var shipTable = document.getElementById("ship_table");
                             if (shipTable) {shipTable.parentNode.removeChild(shipTable);}
-                            tableCreate1(finalArray); //redraw grid each time ship added
+                            shipGridCreate(finalArray); //redraw grid each time ship added
                              //will need to clear finalArray after I send it to server...or make table logic so server data overrides finalArray data
                             var shipList = document.getElementById("ship_list");
                             if (shipList) {shipList.parentNode.removeChild(shipList);}
@@ -228,7 +239,7 @@ $(document).ready(function(){
                 data: json
             })
             .done(function (data, status, jqXHR) {
-                alert( "Ships Placed");
+//                alert( "Ships Placed");
                 window.location.reload();
                 console.log(data);
             })
@@ -272,12 +283,25 @@ $(document).ready(function(){
 
       }
 
+      //list of ships placed displayed in html for game
+      function listPlacedShips(data){
+          var body = document.getElementById('list');
+          var str = '<ul id="ship_list">';
+          str += 'Ships Placed:'
+          for(var i=0; i< data.main_player_ships.length; i++){
+             str += '<li id="' + i + '"><label> '+data.main_player_ships[i].type+'  at: ';
+             str += data.main_player_ships[i].locations+' </label> ';
+          }
+          str += '</ul>';
+          $(body).append(str);
+      }
+
     function removeShipFromFinalArray(data){
         //remove the matching data from finalArray
         finalArray.splice(data[0].id, 1); //data[0].id = li element id and matching index in finalArray that was clicked
         var shipTable = document.getElementById("ship_table");
         if (shipTable) {shipTable.parentNode.removeChild(shipTable);}
-        tableCreate1(finalArray);
+        shipGridCreate(finalArray);
     }
 
 
@@ -473,7 +497,7 @@ $(document).ready(function(){
           }
 
 //create and fill salvo grid, marked where gamePlayer has shot at opponent
-     function tableCreate2(data) {
+     function salvoGridCreate(data) {
          var body = document.getElementById('salvo_grid');
          var tbl = document.createElement('table');
 //         tbl.style.width = '35%';
