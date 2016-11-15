@@ -5,10 +5,51 @@
     <title>Ship Grid</title>
 </head>
 
+<style>
+        #header {
+        width: 100%;
+    }
+    .container {
+        width: 700px;
+        margin: auto;
+    }
+    #ship_grid {
+        width: 300px;
+        float: left;
+        height: 300px;
+    }
+    #list {
+        width: 300px;
+        float: left;
+        height: 400px;
+    }
+
+    #salvo_grid {
+        width: 300px;
+        float: left;
+        height: 400px;
+    }
+        #submit {
+        width: 100px;
+        float: left;
+        height:50px;
+    }
+
+</style>
+
 <body>
-<div id="player_email"></div></br>
-<div id="ship_grid"></div></br>
-<div id="salvo_grid"></div>
+
+<div id="header">
+    <div class='container' id="player_email"></div>
+</div>
+<div class='container'>
+
+    <div id="ship_grid"></div>
+    <div id="list"></div>
+    <div id="salvo_grid"></div>
+    <div id="submit"></div>
+
+</div>
 
 <script src="https://code.jquery.com/jquery-2.2.0.js"></script>
 <script src="/js/shipGrid.js"></script>

@@ -242,13 +242,6 @@ $(document).ready(function(){
 
       //list of ships placed displayed in html as they are placed
       function shipListCreate(finalArray){
-
-           $("ul").on("click", "button", function(e) {
-               e.preventDefault();
-               $(this).parent().remove();
-               //add code to remove that ship from finalArray here
-           });
-
           var body = document.getElementById('list');
           var str = '<ul id="ship_list">';
           str += 'Ships Placed:'
