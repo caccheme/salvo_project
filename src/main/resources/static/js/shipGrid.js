@@ -29,23 +29,6 @@ $(document).ready(function(){
         }
   });//end ajax
 
-
-//uncomment this when ship placement is final...this will be called when the user submits the full finalArray of the ships
-//     //post the JSON string for a list of ships to controller
-//      $.post({
-//              url: "/api/games/players/" + gamePlayer_Id + "/ships",
-//              dataType: "json",
-//              contentType: "application/json",
-//              data: JSON.stringify([{ "shipType": "destroyer", "shipLocations": ["A1", "B1", "C1"] },
-//                                     { "shipType": "patrol boat", "shipLocations": ["H5", "H6"] }]),
-//          })
-//          .done(function (data, status, jqXHR) {
-//              console.log(data);
-//          })
-//          .fail(function (jqXHR, status, httpError) {
-//              alert("Error: " + status + " " + httpError);
-//          });
-
 //show player email on page
       function showPlayerEmail(data) {
              $("#player_email").text("Welcome, "+ data.main_player + "!");
@@ -53,9 +36,9 @@ $(document).ready(function(){
 
 //create and fill ship grid, mark where opponent has hit ships
      function tableCreate1(data) {
-         var body = document.getElementsByTagName('div')[1];
+         var body = document.getElementById('ship_grid');
          var tbl = document.createElement('table');
-         tbl.style.width = '35%';
+//         tbl.style.width = '35%';
          tbl.setAttribute('border', '1');
          tbl.setAttribute('text-align', 'center');
          tbl.setAttribute('id', 'ship_table');
@@ -124,7 +107,7 @@ $(document).ready(function(){
             var cellLettersArray=[];
             var rowArray = [];
             var table = document.getElementById("ship_table");
-            var cells = table.getElementsByTagName("td"); //Uncaught TypeError: Cannot read property 'getElementsByTag' of null
+            var cells = table.getElementsByTagName("td");
 
             for(var i = 1; i < cells.length; i++){
               // Cell Object
@@ -141,24 +124,21 @@ $(document).ready(function(){
 
                   //check to see if a click is the same as previous ship location or click
                   for (var i=0; i < finalArray.length; i++){
-                     for (var j=0; j < finalArray[i].locations.length; j++){
-                         if (newLocation == finalArray[i].locations[j]){
-                               console.log(finalArray[i].locations[j] + " is the same as the click: " + newLocation);
-                               alert("This location is already being used by another ship.");//how to set up dialog to cancel old ship placement here?
-                               //how to now continue on to adding click info and ship info to final Array here with dialog decision
-                         }
-                         else{//click location not already used
-//                       //  need to have array with all ship shaded in locations, so that can see if they click on middle of another ship
-//                          kicks them out to the code below that creates the finalArray...
+                     for (var j=0; j < finalArray[i].shipLocations.length; j++){
+                         if (newLocation == finalArray[i].shipLocations[j]){
+                               console.log(finalArray[i].shipLocations[j] + " is the same as the click: " + newLocation);
+                               alert("This location is already being used by another ship.");
+                               //remove the first click
+                               count = 0;//reset the count to zero again...
                          }
                      }
                   }
 
-                 cellArray.push(cellIndex);
-                 cellLettersArray.push(cellLetter);
-                 rowArray.push(rowIndex);
+                  cellArray.push(cellIndex);
+                  cellLettersArray.push(cellLetter);
+                  rowArray.push(rowIndex);
 
-////get the all ship selection locations into the tempArray
+////get all ship selection locations into the tempArray
                    if (cellLettersArray[0] != cellLettersArray[1]){//then it is horizontal
                    //find the cellIndexes between, create new locations with same rowIndex, add to tempArray
                         if (cellArray[0]<cellArray[1]){
@@ -194,23 +174,28 @@ $(document).ready(function(){
 
                  if (count == 2) { //find length of ship after two clicks
                      count = 0;//reset the count to zero again...
-                     var cellDiff = calculateDifference(cellArray[0], cellArray[1]); //cellDiff is undefined????
+                     var cellDiff = calculateDifference(cellArray[0], cellArray[1]);
                      var rowDiff = calculateDifference(rowArray[0], rowArray[1]);
 
                      if (checkIfDiagonal(cellDiff, rowDiff) == false){
                          var shipLength = cellDiff + rowDiff;
                          var shipType = findShipType(shipLength);
                          if (shipType != false){
-                             finalArray.push({"type": shipType, "locations": tempArray});
-
+                             finalArray.push({"shipType": shipType, "shipLocations": tempArray});
 
                      //redraw table to show where ships are being placed with each new selection
                             var shipTable = document.getElementById("ship_table");
                             if (shipTable) {shipTable.parentNode.removeChild(shipTable);}
                             tableCreate1(finalArray); //redraw grid each time ship added
                              //will need to clear finalArray after I send it to server...or make table logic so server data overrides finalArray data
+                            var shipList = document.getElementById("ship_list");
+                            if (shipList) {shipList.parentNode.removeChild(shipList);}
 
-                             //make is so the grid is shaded in between these location here...
+                            shipListCreate(finalArray);
+                            if (finalArray.length == 5){
+                                addSubmitButton(finalArray);
+                            }
+
                          }
                          console.log("shipLength is: " + shipLength)
                          console.log(finalArray);
@@ -228,6 +213,80 @@ $(document).ready(function(){
               }
             }
       }
+
+      function addSubmitButton(finalArray){
+          var body = document.getElementById('submit');
+          var button = document.createElement('button');
+          button.setAttribute('id', 'ships_button');
+          button.innerHTML = 'Submit Ship Placement';
+          var json = JSON.stringify(finalArray);
+          button.onclick = function(){
+             $.post({
+                url: "/api/games/players/" + gamePlayer_Id + "/ships",
+                dataType: "text",
+                contentType: "application/json",
+                data: json
+            })
+            .done(function (data, status, jqXHR) {
+                alert( "Ships Placed");
+                window.location.reload();
+                console.log(data);
+            })
+            .fail(function (jqXHR, status, httpError) {
+                alert("Error: " + status + " " + httpError);
+            });
+            return false;
+          };
+          body.appendChild(button);
+      }
+
+      //list of ships placed displayed in html as they are placed
+      function shipListCreate(finalArray){
+
+           $("ul").on("click", "button", function(e) {
+               e.preventDefault();
+               $(this).parent().remove();
+               //add code to remove that ship from finalArray here
+           });
+
+          var body = document.getElementById('list');
+          var str = '<ul id="ship_list">';
+          str += 'Ships Placed:'
+          for(var i=0; i<finalArray.length; i++){
+             str += '<li id="' + i + '"><label> '+finalArray[i].shipType+'  at locations: ';
+             str += finalArray[i].shipLocations+' </label> ';
+             str += '<button>Delete</button></li>'; //add button on each ship
+          }
+          str += '</ul>';
+          $(body).append(str);
+
+            $("ul").on("click", "button", function(e) {
+                e.preventDefault();
+                //remove submit button from screen if deleting a ship placement and have five ships up
+                if (finalArray.length == 5){
+                    var elem = document.getElementById('ships_button');
+                    elem.parentNode.removeChild(elem);
+
+                }
+                //remove ship data from finalArray
+                removeShipFromFinalArray($(this).parent());
+                //remove ship data from list
+                $(this).parent().remove();
+
+                return false;
+
+            });
+
+      }
+
+    function removeShipFromFinalArray(data){
+        //remove the matching data from finalArray
+        finalArray.splice(data[0].id, 1); //data[0].id = li element id and matching index in finalArray that was clicked
+        var shipTable = document.getElementById("ship_table");
+        if (shipTable) {shipTable.parentNode.removeChild(shipTable);}
+        tableCreate1(finalArray);
+    }
+
 
     //this function checks for multiples, and also if size valid before sending shipType to final array,
     //if not valid size or is a duplicate of a ship already placed, the new ship is not put in array
@@ -252,23 +311,23 @@ $(document).ready(function(){
         }
         else{
             var numPatrolBoats = finalArray.reduce(function(n, ship) { //DRY up these num... variables
-                return n + (ship.type == 'patrol boat');
+                return n + (ship.shipType == 'patrol boat');
             }, 0);
 
             var numDestroyers = finalArray.reduce(function(n, ship) {
-                return n + (ship.type == 'destroyer');
+                return n + (ship.shipType == 'destroyer');
             }, 0);
 
             var numSubmarines = finalArray.reduce(function(n, ship) {
-                return n + (ship.type == 'submarine');
+                return n + (ship.shipType == 'submarine');
             }, 0);
 
             var numBattleships = finalArray.reduce(function(n, ship) {
-                return n + (ship.type == 'battleship');
+                return n + (ship.shipType == 'battleship');
             }, 0);
 
             var numCarriers = finalArray.reduce(function(n, ship) {
-                return n + (ship.type == 'carrier');
+                return n + (ship.shipType == 'carrier');
             }, 0);
 
                 if (shipLength == 2){
@@ -347,15 +406,15 @@ $(document).ready(function(){
           var newArray = [];
           if (data.main_player_ships != null){
               for (var i=0; i < data.main_player_ships.length; i++){
-                   for (var j=0; j < data.main_player_ships[i].locations.length; j++){ //.length of undefined error
+                   for (var j=0; j < data.main_player_ships[i].locations.length; j++){
                       newArray.push(data.main_player_ships[i].locations[j]);
                    }
               }
           }
           else {
              for (var i=0; i< data.length; i++){
-                for (var j=0; j<data[i].locations.length; j++){
-                    newArray.push(data[i].locations[j]);
+                for (var j=0; j<data[i].shipLocations.length; j++){
+                    newArray.push(data[i].shipLocations[j]);
                 }
              }
           }
@@ -422,9 +481,9 @@ $(document).ready(function(){
 
 //create and fill salvo grid, marked where gamePlayer has shot at opponent
      function tableCreate2(data) {
-         var body = document.getElementsByTagName('div')[2];
+         var body = document.getElementById('salvo_grid');
          var tbl = document.createElement('table');
-         tbl.style.width = '35%';
+//         tbl.style.width = '35%';
          tbl.setAttribute('border', '1');
          tbl.setAttribute('text-align', 'center');
          var tbdy = document.createElement('tbody');
