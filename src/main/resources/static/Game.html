@@ -6,7 +6,7 @@
 </head>
 
 <style>
-        #header {
+    #header {
         width: 100%;
     }
     .container {
@@ -41,12 +41,31 @@
 
 <div id="header">
     <div class='container' id="player_email"></div>
+    <div class='container' id="instructions">
+        <p>
+            Click on a cell to mark the beginning of a ship
+            and click on a second cell to mark the end of that same ship.
+            No ships can overlap or be placed diagonally.  If you are not happy with a ship's placement,
+            delete that ship and place it again.</p>
+        <p>
+            Once you have place all your ships, you can click the 'submit' button that will appear.
+        </p>
+    </div>
 </div>
 <div class='container'>
 
-    <div id="ship_grid"></div>
-    <div id="list"></div>
-    <div id="salvo_grid"></div>
+
+    <div id="ship_grid"><h1>Ship Grid</h1></div>
+    <div id="list">
+        <ul id="total_ships">Total Ships:
+            <li>Patrol Boat (2 spaces)</li>
+            <li>Destroyer (3 spaces)</li>
+            <li>Submarine (3 spaces)</li>
+            <li>Battleship (4 spaces)</li>
+            <li>Carrier (5 spaces)</li>
+        </ul>
+    </div>
+    <div id="salvo_grid"><h1>Salvo Grid</h1></div>
     <div id="submit"></div>
 
 </div>
