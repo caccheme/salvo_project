@@ -113,45 +113,48 @@ $(document).ready(function(){
 
      var finalArray = [];
      function clickableTable() {
-            var tempArray = [];
-            var cellArray = [];
-            var cellLettersArray=[];
-            var rowArray = [];
-            var table = document.getElementById("ship_table");
-            var cells = table.getElementsByTagName("td");
+        var tempArray = [];
+        var cellArray = [];
+        var cellLettersArray=[];
+        var rowArray = [];
+        var table = document.getElementById("ship_table");
+        var cells = table.getElementsByTagName("td");
 
-            for(var i = 1; i < cells.length; i++){
-              // Cell Object
-              var cell = cells[i];
-              // Track with onclick
-              cell.onclick = function(){
-                 incrementCount();
-                 var alphaArray = [" ", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J"]; //so jArray[1] should = "A", etc
+        for(var i = 1; i < cells.length; i++){
+           // Cell Object
+            var cell = cells[i];
+            // Track with onclick
+            cell.onclick = function(){
+                incrementCount();
+                var alphaArray = [" ", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J"]; //so jArray[1] should = "A", etc
+                var cellIndex = this.cellIndex;
+                var cellLetter  = alphaArray[cellIndex];
+                var rowIndex = this.parentNode.rowIndex;
+                var newLocation = cellLetter + rowIndex;
 
-                  var cellIndex = this.cellIndex;
-                  var cellLetter  = alphaArray[cellIndex];
-                  var rowIndex = this.parentNode.rowIndex;
-                  var newLocation = cellLetter + rowIndex;
+                if (finalArray.length == 0){ //first ship won't overlap any other ships so just push to arrays
+                    cellArray.push(cellIndex);
+                    cellLettersArray.push(cellLetter);
+                    rowArray.push(rowIndex);
+                }
+                else {//all the rest of ships have to be checked for overlap of click position
+                    if (locationAlreadyUsed(newLocation, finalArray) == true){
+                        alert("This location is already being used by another ship.");
+                        resetArraysAndCounts();
+                        redrawShipTable(finalArray);
+                        updateShipList(finalArray);
+                    }
+                    else {
+                        cellArray.push(cellIndex);
+                        cellLettersArray.push(cellLetter);
+                        rowArray.push(rowIndex);
+                    }
+                }//end first and second click location overlap check
 
-                  //check to see if a click is the same as previous ship location or click
-                  for (var i=0; i < finalArray.length; i++){
-                     for (var j=0; j < finalArray[i].shipLocations.length; j++){
-                         if (newLocation == finalArray[i].shipLocations[j]){
-                               console.log(finalArray[i].shipLocations[j] + " is the same as the click: " + newLocation);
-                               alert("This location is already being used by another ship.");
-                               //remove the first click
-                               count = 0;//reset the count to zero again...
-                         }
-                     }
-                  }
-
-                  cellArray.push(cellIndex);
-                  cellLettersArray.push(cellLetter);
-                  rowArray.push(rowIndex);
-
-////get all ship selection locations into the tempArray
-                   if (cellLettersArray[0] != cellLettersArray[1]){//then it is horizontal
-                   //find the cellIndexes between, create new locations with same rowIndex, add to tempArray
+                if (cellLettersArray.length == 2){
+                    //get  all ship selection locations into the tempArray
+                    if (cellLettersArray[0] != cellLettersArray[1]){//then it is horizontal
+                    //find the cellIndexes between, create new locations with same rowIndex, add to tempArray
                         if (cellArray[0]<cellArray[1]){
                             var lowEnd = cellArray[0];
                             var highEnd = cellArray[1];
@@ -162,11 +165,10 @@ $(document).ready(function(){
                         }
                         for (var i = lowEnd; i <= highEnd; i++) {
                             newLocation = alphaArray[i]+rowIndex;
-                            tempArray.push(newLocation);
+                            tempArray.push(newLocation)
                         }
-
-                   }
-                   if (cellLettersArray[0] == cellLettersArray[1]){ //then it is vertical
+                    }
+                    if (cellLettersArray[0] == cellLettersArray[1]){ //then it is vertical
                         //find the rowIndexes between, create new locations with same cellLetter, add to tempArray
                         cellLetter = alphaArray[cellIndex];
                         if (rowArray[0]<rowArray[1]){
@@ -181,49 +183,109 @@ $(document).ready(function(){
                             newLocation = cellLetter+i;
                             tempArray.push(newLocation);
                         }
-                   }
+                    }//end of get all ship locations into tempArray
 
-                 if (count == 2) { //find length of ship after two clicks
-                     count = 0;//reset the count to zero again...
-                     var cellDiff = calculateDifference(cellArray[0], cellArray[1]);
-                     var rowDiff = calculateDifference(rowArray[0], rowArray[1]);
+                    if (middleLocationAlreadyUsed(tempArray, finalArray) == true){//check that no overlap
+                        alert("This location is already being used by another ship.");
+                        resetArraysAndCounts();
+                        redrawShipTable(finalArray);
+                        updateShipList(finalArray);
+                    }
+                    else{//continue to check diagonal and shipType/length
+                        var cellDiff = calculateDifference(cellArray[0], cellArray[1]); //should be two in here as well
+                        var rowDiff = calculateDifference(rowArray[0], rowArray[1]); //ditto
 
-                     if (checkIfDiagonal(cellDiff, rowDiff) == false){
-                         var shipLength = cellDiff + rowDiff;
-                         var shipType = findShipType(shipLength);
-                         if (shipType != false){
-                             finalArray.push({"shipType": shipType, "shipLocations": tempArray});
-
-                     //redraw table to show where ships are being placed with each new selection
-                            var shipTable = document.getElementById("ship_table");
-                            if (shipTable) {shipTable.parentNode.removeChild(shipTable);}
-                            shipGridCreate(finalArray); //redraw grid each time ship added
-                             //will need to clear finalArray after I send it to server...or make table logic so server data overrides finalArray data
-                            var shipList = document.getElementById("ship_list");
-                            if (shipList) {shipList.parentNode.removeChild(shipList);}
-
-                            shipListCreate(finalArray);
-                            if (finalArray.length == 5){
-                                addSubmitButton(finalArray);
+                        if (isDiagonal(cellDiff, rowDiff) == false){//check if diagonal
+                            var shipLength = cellDiff + rowDiff;
+                            var shipType = findShipType(shipLength);
+                            if (shipType != false){ //check if length available and correct
+                                finalArray.push({"shipType": shipType, "shipLocations": tempArray});
+                                redrawShipTable(finalArray);
+                                updateShipList(finalArray);
+                                if (submitButtonNeeded(finalArray) == true){
+                                    addSubmitButton(finalArray);
+                                }
                             }
+                            else {
+                                redrawShipTable(finalArray);
+                                updateShipList(finalArray);
+                                resetArraysAndCounts();
+                            }
+                            console.log("shipLength is: " + shipLength)
+                            console.log(finalArray);
+                            resetArraysAndCounts();
+                        }
+                        else{
+                            alert("This is a diagonal placement. Please choose either a vertical or horizontal ship placement on the grid.");
+                            resetArraysAndCounts();
+                            redrawShipTable(finalArray);
+                            updateShipList(finalArray);
+                        } //end diagonal/length/type logic checks...!!!need to add overlap check again within this!!!
+                    }//end of overlap logic check
+                } //end limit of 2 clicks
+            } //end onClick function
+        } //end cell length loop
+     } //end clickable table
 
-                         }
-                         console.log("shipLength is: " + shipLength)
-                         console.log(finalArray);
-                         tempArray = [];//reset tempArray after each set of two clicks
-                     }
-                     else{
-                         alert("This is a diagonal placement. Please choose either a vertical or horizontal ship placement on the grid.");
-                         tempArray = [];
-                     }
+     function resetArraysAndCounts(){
+        count = 0;
+        cellArray = [];
+        rowArray = [];
+        cellLettersArray = [];
+        tempArray = [];
+     }
 
-                     cellArray = []; //reset the array after each two clicks
-                     rowArray = []; //reset the array after each two clicks
-                 }
+    function submitButtonNeeded(finalArray) {
+        result = false;
+        if (finalArray.length == 5){
+            result = true;
+        }
+        return result;
+    }
 
-              }
+     function redrawShipTable(finalArray){
+        //redraw table to show where ships are being temporarily placed with each new selection
+        var shipTable = document.getElementById("ship_table");
+        if (shipTable) {shipTable.parentNode.removeChild(shipTable);}
+        shipGridCreate(finalArray); //redraw grid each time ship added
+     }
+
+     function updateShipList(finalArray) {
+        var shipList = document.getElementById("ship_list");
+        if (shipList) {shipList.parentNode.removeChild(shipList);}
+        shipListCreate(finalArray);
+     }
+
+     function locationAlreadyUsed(newLocation, finalArray){
+          result = false;
+          //check to see if a click is the same as previous ship location or click
+          for (var i=0; i < finalArray.length; i++){
+             for (var j=0; j < finalArray[i].shipLocations.length; j++){
+                 if (newLocation == finalArray[i].shipLocations[j]){
+                     console.log(finalArray[i].shipLocations[j] + " is the same as the click: " + newLocation);
+                     result = true;
+               }
+           }
+        }
+        return result;
+     }
+
+    function middleLocationAlreadyUsed(tempArray, finalArray){
+        result = false;
+        //check to see if a click is the same as previous ship location or click
+        for (var a=0; a< tempArray.length; a++){
+            for (var i=0; i < finalArray.length; i++){
+                for (var j=0; j < finalArray[i].shipLocations.length; j++){
+                    if (tempArray[a] == finalArray[i].shipLocations[j]){
+                        console.log(finalArray[i].shipLocations[j] + " is the same as the click: " + tempArray[a]);
+                        result = true;
+                    }
+                }
             }
-      }
+        }
+        return result;
+    }
+
 
       function addSubmitButton(finalArray){
           var body = document.getElementById('submit');
@@ -393,7 +455,7 @@ $(document).ready(function(){
         }
      }
 
-     function checkIfDiagonal(cellDiff, rowDiff) {
+     function isDiagonal(cellDiff, rowDiff) {
            if (cellDiff != 0 && rowDiff != 0){//then they clicked diagonally
                 return true;
            }
