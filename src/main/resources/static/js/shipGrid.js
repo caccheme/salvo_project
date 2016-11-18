@@ -30,7 +30,6 @@ $(document).ready(function(){
                        hideShipPlacementInstructions();
                    }
 
-
                 console.log(data);
 
         }
@@ -113,7 +112,19 @@ $(document).ready(function(){
          }
          tbl.appendChild(tbdy);
          body.appendChild(tbl);
-         clickableTable();
+         if (finalArray.length <= 5){
+            if (data.main_player_ships){
+                if (data.main_player_ships.length == 5){
+                    //not clickable...can't add ships
+                }
+                if (data.main_player_ships.length == 0){
+                    clickableTable();
+                }
+            }
+            else{
+                clickableTable();
+            }
+         }
      }
 
      var finalArray = [];
