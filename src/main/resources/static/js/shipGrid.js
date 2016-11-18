@@ -1,4 +1,5 @@
 $(document).ready(function(){
+    $("#salvo_header").hide();
 
     //see if user can see this page....
     var gamePlayer_Id = getParameterByName('gp');
@@ -38,6 +39,10 @@ $(document).ready(function(){
 //show player email on page
       function showPlayerEmail(data) {
              $("#player_email").text("Welcome, "+ data.main_player + "!");
+      }
+
+      function showSalvoHeader() {
+            $("#salvo_header").show();
       }
 
       function hideShipPlacementInstructions() {
@@ -553,13 +558,13 @@ $(document).ready(function(){
                                    }
                                 }
                             }
-
                         }
               return result;
           }
 
 //create and fill salvo grid, marked where gamePlayer has shot at opponent
      function salvoGridCreate(data) {
+         showSalvoHeader();
          var body = document.getElementById('salvo_grid');
          var tbl = document.createElement('table');
 //         tbl.style.width = '35%';
