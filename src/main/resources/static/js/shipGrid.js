@@ -15,6 +15,7 @@ $(document).ready(function(){
         return decodeURIComponent(results[2].replace(/\+/g, " "));
     }
 
+
 //get shipLocation data for a specific gamePlayer_Id
   $.ajax({
         method: "get",
@@ -25,15 +26,29 @@ $(document).ready(function(){
                    showPlayerEmail(data);
                    //only show salvo grid after ships placed
                    if (data.main_player_ships.length != 0){
-                       salvoGridCreate(data);
                        listPlacedShips(data);
                        hideShipPlacementInstructions();
-                   }
-
+                       salvoGridCreate(data);
+                    }
                 console.log(data);
-
         }
   });//end ajax
+
+  //test post to put canned data salvos in ....
+//      $.post({
+//              url: "/api/games/players/" + gamePlayer_Id + "/salvos",
+//              dataType: "json",
+//              contentType: "application/json",
+//              data: JSON.stringify([{ "turn": "10", "salvoLocations": ["J1", "J8", "J10"] }]),
+//          })
+//          .done(function (data, status, jqXHR) {
+//              console.log(data);
+//              alert("salvo created:" + data.salvoLocations);
+//          })
+//          .fail(function (jqXHR, status, httpError) {
+//              alert("Error: " + status + " " + httpError);
+//          });
+
 
 //show player email on page
       function showPlayerEmail(data) {
@@ -118,17 +133,17 @@ $(document).ready(function(){
                     //not clickable...can't add ships
                 }
                 if (data.main_player_ships.length == 0){
-                    clickableTable();
+                    clickToAddShipsToTable();
                 }
             }
             else{
-                clickableTable();
+                clickToAddShipsToTable();
             }
          }
      }
 
      var finalArray = [];
-     function clickableTable() {
+     function clickToAddShipsToTable() {
         var tempArray = [];
         var cellArray = [];
         var cellLettersArray=[];
@@ -243,6 +258,69 @@ $(document).ready(function(){
         } //end cell length loop
      } //end clickable table
 
+    var currentTurn = "";
+    function getCurrentTurnNumber(data){
+        var turns = [];
+         if (data.gamePlayers){
+            for (var i=0; i < data.gamePlayers.length; i++){
+                if (data.gamePlayers[i].gamePlayer_id == gamePlayer_Id){ //get only one gamePlayer's salvo locations
+                    for (var j = 0; j < data.gamePlayers[i].player_info.salvoes.length ; j++){
+                       for (var k = 0; k < data.gamePlayers[i].player_info.salvoes[j].locations.length; k++){
+                          if (data.gamePlayers[i].player_info.salvoes[j].locations[k] == cellString){
+                             turns.push(data.gamePlayers[i].player_info.salvoes[j].turn);
+                          }
+                       }
+                    }
+                }
+            }
+         }
+         else{
+            for (var i=0; i < data.length; i++){
+                turns.push(data[i].turn);
+            }
+         }
+
+         currentTurn = arrayMax(turns)+1;
+         return currentTurn;
+         console.log(turnNumber);
+    }
+
+    function arrayMax(arr) {
+      return arr.reduce(function (p, v) {
+        return ( p > v ? p : v );
+      });
+    }
+
+     function clickToFireSalvos() {
+        var tempArray = [];
+        var table = document.getElementById("salvo_table");
+        var cells = table.getElementsByTagName("td");
+
+        for(var i = 1; i < cells.length; i++){
+           // Cell Object
+            var cell = cells[i];
+            // Track with onclick
+            cell.onclick = function(){
+                incrementCount();
+                var alphaArray = [" ", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J"]; //so jArray[1] should = "A", etc
+                var cellIndex = this.cellIndex;
+                var cellLetter  = alphaArray[cellIndex];
+                var rowIndex = this.parentNode.rowIndex;
+                var newLocation = cellLetter + rowIndex;
+
+                var turnNumber = 1; //update this so that it is +1 of gamePlayer turns found in database
+
+                tempArray.push(newLocation);
+                finalArray.push({"turn": turnNumber, "salvoLocations": tempArray});
+                redrawSalvoTable(finalArray);
+                console.log(finalArray);
+
+//                } //end limit of 5 clicks
+            } //end onClick function
+        } //end cell length loop
+     } //end clickable table
+
+
      function resetArraysAndCounts(){
         count = 0;
         cellArray = [];
@@ -264,6 +342,13 @@ $(document).ready(function(){
         var shipTable = document.getElementById("ship_table");
         if (shipTable) {shipTable.parentNode.removeChild(shipTable);}
         shipGridCreate(finalArray); //redraw grid each time ship added
+     }
+
+     function redrawSalvoTable(finalArray){
+        //redraw table to show where salvos are being temporarily placed with each new selection
+        var salvoTable = document.getElementById("salvo_table");
+        if (salvoTable) {salvoTable.parentNode.removeChild(salvoTable);}
+        salvoGridCreate(finalArray); //redraw grid each time salvo added
      }
 
      function updateShipList(finalArray) {
@@ -556,6 +641,20 @@ $(document).ready(function(){
             return myNewArray;
           }
 
+        function getOldSalvoData(data) {
+//            var currentTurn = ....
+            var result = []
+                for( var n=0; n < data.length; n++){
+                    if (data[n].turn != currentTurn){
+                        for (var i = 0; i < data[0].salvoLocations.length ; i++) {
+                            result.push(data[n].salvoLocations[i]);
+                        }
+                    }
+                }
+            var myNewArray = [].concat.apply([], result);
+            return myNewArray;
+        }
+
           function getOpponentTurnNumber(data, cellString){
               result = "";
               newArray = [];
@@ -581,7 +680,9 @@ $(document).ready(function(){
 //         tbl.style.width = '35%';
          tbl.setAttribute('border', '1');
          tbl.setAttribute('text-align', 'center');
+         tbl.setAttribute('id', 'salvo_table')
          var tbdy = document.createElement('tbody');
+
          for (var i = 0; i < 11; i++) {
              var tr = document.createElement('tr');
 
@@ -613,11 +714,22 @@ $(document).ready(function(){
 
                     var cellString = myConcatFunction(j,i);
 
-                    //  loop over rest of grid, check for salvoLocations
                     if (checkLocations(getSalvoData(data), cellString) == true) {
-                       td.style.backgroundColor = "orange";
-                       td.appendChild(document.createTextNode(getTurnNumber(data, cellString)));
-                     }
+                        if (data.gamePlayers){
+                            td.style.backgroundColor = "orange"
+                            td.appendChild(document.createTextNode(getTurnNumber(data, cellString)));
+                        }
+                        else { //make orange old salvoes and grey the new salvoes to be submitted
+                            //if salvo is being placed it will be grey until it is in the server data
+                            td.style.backgroundColor = "orange";
+//                            td.appendChild(document.createTextNode(getOldTurnNumber(data, cellString))); //later get the turn numbers for old and new salvoes
+
+                            if (td.style.backgroundColor == "orange" && checkLocations(getOldSalvoData(data), cellString) == true) {
+                                td.style.backgroundColor = "grey"
+//                                td.appendChild(document.createTextNode(getTurnNumber(data, cellString)));
+                            }
+                        }
+                    }
                     tr.appendChild(td)
                  }
              }
@@ -625,37 +737,55 @@ $(document).ready(function(){
          }
          tbl.appendChild(tbdy);
          body.appendChild(tbl)
+         clickToFireSalvos();
      }
 
+     var newArray = [];
      function getSalvoData(data){
-          var newArray = [];
-                for (var i=0; i < data.gamePlayers.length; i++){
-                    if (data.gamePlayers[i].gamePlayer_id == gamePlayer_Id){ //get only one gamePlayer's salvo locations
-                        for (var j = 0; j < data.gamePlayers[i].player_info.salvoes.length ; j++){
-                           for (var k = 0; k < data.gamePlayers[i].player_info.salvoes[j].locations.length; k++){
-                                 newArray.push(data.gamePlayers[i].player_info.salvoes[j].locations[k]);
-                           }
-                        }
+//        var newArray = [];
+        if (data.gamePlayers != null){
+            for (var i=0; i < data.gamePlayers.length; i++){
+                if (data.gamePlayers[i].gamePlayer_id == gamePlayer_Id){ //get only one gamePlayer's salvo locations
+                    for (var j = 0; j < data.gamePlayers[i].player_info.salvoes.length ; j++){
+                       for (var k = 0; k < data.gamePlayers[i].player_info.salvoes[j].locations.length; k++){
+                             newArray.push(data.gamePlayers[i].player_info.salvoes[j].locations[k]);
+                       }
                     }
                 }
-          return newArray;
+            }
+        }
+        else {
+           for (var i=0; i< data.length; i++){
+              for (var j=0; j< data[i].salvoLocations.length; j++){
+                newArray.push(data[i].salvoLocations[j]);
+              }
+           }
+        }
+        return newArray;
      }
 
      function getTurnNumber(data, cellString){
          result = "";
-         newArray = [];
-         for (var i=0; i < data.gamePlayers.length; i++){
-                       if (data.gamePlayers[i].gamePlayer_id == gamePlayer_Id){ //get only one gamePlayer's salvo locations
-                           for (var j = 0; j < data.gamePlayers[i].player_info.salvoes.length ; j++){
-                              for (var k = 0; k < data.gamePlayers[i].player_info.salvoes[j].locations.length; k++){
-                                 if (data.gamePlayers[i].player_info.salvoes[j].locations[k] == cellString){
-                                    result = data.gamePlayers[i].player_info.salvoes[j].turn
-                                 }
-                              }
-                           }
+//         newArray = [];
+         if (data.gamePlayers){
+            for (var i=0; i < data.gamePlayers.length; i++){
+                if (data.gamePlayers[i].gamePlayer_id == gamePlayer_Id){ //get only one gamePlayer's salvo locations
+                    for (var j = 0; j < data.gamePlayers[i].player_info.salvoes.length ; j++){
+                       for (var k = 0; k < data.gamePlayers[i].player_info.salvoes[j].locations.length; k++){
+                          if (data.gamePlayers[i].player_info.salvoes[j].locations[k] == cellString){
+                             result = data.gamePlayers[i].player_info.salvoes[j].turn
+                          }
                        }
+                    }
+                }
+            }
+         }
+         else{
+            for (var i=0; i < data.length; i++){
+                result = data[i].turn;
+            }
+         }
 
-                   }
          return result;
      }
 

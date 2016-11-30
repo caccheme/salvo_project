@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import salvo.model.*;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
 
@@ -30,6 +31,8 @@ public class SalvoController {
         private PlayerRepository playerRepository;
         @Autowired
         private ShipRepository shipRepository;
+        @Autowired
+        private SalvoRepository salvoRepository;
 
         @RequestMapping(value = "/games", method = RequestMethod.GET)
         public Map<String, Object> getGames() {
@@ -149,10 +152,6 @@ public class SalvoController {
                 return result;
         }
 
-//        Required request body is missing:
-// public org.springframework.http.ResponseEntity<java.util.Map<java.lang.String, java.lang.Object>>
-// salvo.SalvoController.placeGamePlayerShips(java.lang.Long,salvo.model.Ship)
-
         @RequestMapping("/games/players/{gamePlayer_Id}/ships")
         public ResponseEntity<Map<String, Object>> placeGamePlayerShips(@PathVariable Long gamePlayer_Id,
                                                                         @RequestBody List<Ship> ships) {
@@ -185,6 +184,50 @@ public class SalvoController {
                         ships.iterator().forEachRemaining(s -> s.setGamePlayer(gamePlayer));
                         ships.iterator().forEachRemaining(s -> shipRepository.save(s));
                         dto.put("ships", collectShipData(gamePlayer.getShips()));
+
+                        result = makeResponse(dto, HttpStatus.CREATED);
+                }
+
+                return result;
+        }
+
+        @RequestMapping("/games/players/{gamePlayer_Id}/salvos")
+        public ResponseEntity<Map<String, Object>> placeGamePlayerSalvos(@PathVariable Long gamePlayer_Id,
+                                                                        @RequestBody List<Salvo> salvos) {
+                Map<String, Object> dto = new LinkedHashMap<>();
+                ResponseEntity result = new ResponseEntity(null, null);
+
+                GamePlayer gamePlayer = gp_repository.findOne(gamePlayer_Id);
+                String currentPlayer = getCurrentUsername();
+                Player player = playerRepository.findOneByEmail(currentPlayer);
+
+                List<Integer> turns = gamePlayer
+                        .getSalvoes()
+                        .stream()
+                        .map(s -> s.getTurn())
+                        .collect(Collectors.toList());
+
+                //no current user logged in OR no gamePlayer with given ID OR
+                //the current user is not the game player the ID references
+                // then unauthorized:
+                if (player == null || gp_repository.findOne(gamePlayer_Id) == null ||
+                        player != gp_repository.findOne(gamePlayer_Id).getPlayer())
+                {
+                        result = makeResponse(null, HttpStatus.UNAUTHORIZED);
+                }
+
+                int currentTurn = salvos.stream().findFirst().map(s -> s.getTurn()).get();
+
+                //A Forbidden response should be sent if the user already has salvos for a turn.
+                if (turns.toArray().length == currentTurn){
+                        result = makeResponse(null, HttpStatus.FORBIDDEN);
+                }
+
+                if (player != null && gp_repository.findOne(gamePlayer_Id) != null &&
+                        player == gp_repository.findOne(gamePlayer_Id).getPlayer())
+                {
+                        salvos.iterator().forEachRemaining(s -> salvoRepository.save(s));
+                        dto.put("salvos", collectSalvoData(gamePlayer.getSalvoes()));
 
                         result = makeResponse(dto, HttpStatus.CREATED);
                 }
