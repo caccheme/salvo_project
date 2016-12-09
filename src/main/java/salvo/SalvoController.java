@@ -226,6 +226,7 @@ public class SalvoController {
                 if (player != null && gp_repository.findOne(gamePlayer_Id) != null &&
                         player == gp_repository.findOne(gamePlayer_Id).getPlayer())
                 {
+                        salvos.iterator().forEachRemaining(s -> s.setGamePlayer(gamePlayer));
                         salvos.iterator().forEachRemaining(s -> salvoRepository.save(s));
                         dto.put("salvos", collectSalvoData(gamePlayer.getSalvoes()));
 

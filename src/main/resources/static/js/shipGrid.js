@@ -29,6 +29,9 @@ $(document).ready(function(){
                        listPlacedShips(data);
                        hideShipPlacementInstructions();
                        salvoGridCreate(data);
+                       var thisTurnNumber = getCurrentTurnNumber(data);
+                       showTurnNumber(thisTurnNumber);
+//                       getMaxTurnNumber(data);
                     }
                 console.log(data);
         }
@@ -57,6 +60,10 @@ $(document).ready(function(){
 
       function showSalvoHeader() {
             $("#salvo_header").show();
+      }
+
+      function showTurnNumber(thisTurnNumber) {
+            $("#turn").text("This is Turn Number: " + thisTurnNumber);
       }
 
       function hideShipPlacementInstructions() {
@@ -266,9 +273,7 @@ $(document).ready(function(){
                 if (data.gamePlayers[i].gamePlayer_id == gamePlayer_Id){ //get only one gamePlayer's salvo locations
                     for (var j = 0; j < data.gamePlayers[i].player_info.salvoes.length ; j++){
                        for (var k = 0; k < data.gamePlayers[i].player_info.salvoes[j].locations.length; k++){
-                          if (data.gamePlayers[i].player_info.salvoes[j].locations[k] == cellString){
-                             turns.push(data.gamePlayers[i].player_info.salvoes[j].turn);
-                          }
+                          turns.push(data.gamePlayers[i].player_info.salvoes[j].turn);
                        }
                     }
                 }
@@ -291,8 +296,10 @@ $(document).ready(function(){
       });
     }
 
+
+     var tempArray = [];
      function clickToFireSalvos() {
-        var tempArray = [];
+
         var table = document.getElementById("salvo_table");
         var cells = table.getElementsByTagName("td");
 
@@ -308,11 +315,19 @@ $(document).ready(function(){
                 var rowIndex = this.parentNode.rowIndex;
                 var newLocation = cellLetter + rowIndex;
 
-                var turnNumber = 1; //update this so that it is +1 of gamePlayer turns found in database
+                var text = document.getElementById("turn").innerHTML;
+                var turnNumber = parseInt(text.replace(/[^0-9\.]/g, ''), 10);
 
                 tempArray.push(newLocation);
-                finalArray.push({"turn": turnNumber, "salvoLocations": tempArray});
-                redrawSalvoTable(finalArray);
+                redrawSalvoTable(tempArray);
+                console.log(tempArray);
+                console.log(tempArray.length);
+                if (count == 5){
+                    finalArray.push({"turn": turnNumber, "salvoLocations": tempArray});
+                    redrawSalvoTable(finalArray);
+                    addSubmitSalvoButton(finalArray);
+                    count = 0;
+                }
                 console.log(finalArray);
 
 //                } //end limit of 5 clicks
@@ -413,6 +428,35 @@ $(document).ready(function(){
           };
           body.appendChild(button);
       }
+
+      function addSubmitSalvoButton(finalArray){
+          var body = document.getElementById('salvo_submit');
+          var button = document.createElement('button');
+          button.setAttribute('id', 'salvos_button');
+          button.innerHTML = 'Submit Salvo Placement';
+          var json = JSON.stringify(finalArray);
+          button.onclick = function(){
+             $.post({
+                url: "/api/games/players/" + gamePlayer_Id + "/salvos",
+                dataType: "text",
+                contentType: "application/json",
+                data: json
+            })
+            .done(function (data, status, jqXHR) {
+//                alert( "Ships Placed");
+                window.location.reload();
+                console.log(data);
+            })
+            .fail(function (jqXHR, status, httpError) {
+                alert("Error: " + status + " " + httpError);
+            });
+            return false;
+          };
+          body.appendChild(button);
+      }
+
+
+
 
       //list of ships placed displayed in html as they are placed
       function shipListCreate(finalArray){
@@ -642,16 +686,20 @@ $(document).ready(function(){
           }
 
         function getOldSalvoData(data) {
-//            var currentTurn = ....
             var result = []
+            if (data[0].turn != null){
                 for( var n=0; n < data.length; n++){
-                    if (data[n].turn != currentTurn){
-                        for (var i = 0; i < data[0].salvoLocations.length ; i++) {
-                            result.push(data[n].salvoLocations[i]);
+                        if (data[n].turn != currentTurn){
+                            for (var i = 0; i < data[0].salvoLocations.length ; i++) {
+                                result.push(data[n].salvoLocations[i]);
+                            }
                         }
                     }
-                }
-            var myNewArray = [].concat.apply([], result);
+                var myNewArray = [].concat.apply([], result);
+            }
+            else{
+                var myNewArray = [];
+            }
             return myNewArray;
         }
 
@@ -721,8 +769,8 @@ $(document).ready(function(){
                         }
                         else { //make orange old salvoes and grey the new salvoes to be submitted
                             //if salvo is being placed it will be grey until it is in the server data
-                            td.style.backgroundColor = "orange";
-//                            td.appendChild(document.createTextNode(getOldTurnNumber(data, cellString))); //later get the turn numbers for old and new salvoes
+                                td.style.backgroundColor = "orange";
+//                              td.appendChild(document.createTextNode(getTurnNumber(data, cellString))); //later get the turn numbers for old and new salvoes
 
                             if (td.style.backgroundColor == "orange" && checkLocations(getOldSalvoData(data), cellString) == true) {
                                 td.style.backgroundColor = "grey"
@@ -754,14 +802,53 @@ $(document).ready(function(){
                 }
             }
         }
-        else {
-           for (var i=0; i< data.length; i++){
-              for (var j=0; j< data[i].salvoLocations.length; j++){
-                newArray.push(data[i].salvoLocations[j]);
-              }
-           }
+        if (data.gamePlayers == null){
+            if (data.salvoLocations != null){
+               for (var i=0; i< data.length; i++){
+                  for (var j=0; j< data[i].salvoLocations.length; j++){
+                    newArray.push(data[i].salvoLocations[j]);
+                  }
+               }
+            }
+            else{
+               for (var i=0; i< data.length; i++){
+                 newArray.push(data[i]);
+               }
+            }
         }
+
         return newArray;
+     }
+
+     function getMaxTurnNumber(data){
+        result = "";
+         array = [];
+         if (data.gamePlayers){
+            for (var i=0; i < data.gamePlayers.length; i++){
+                if (data.gamePlayers[i].gamePlayer_id == gamePlayer_Id){ //get only one gamePlayer's salvo locations
+                    for (var j = 0; j < data.gamePlayers[i].player_info.salvoes.length ; j++){
+                       for (var k = 0; k < data.gamePlayers[i].player_info.salvoes[j].locations.length; k++){
+
+                             array.push(data.gamePlayers[i].player_info.salvoes[j].turn);
+                             var max = Math.max.apply(null, array);
+                             result = max;
+
+                       }
+                    }
+                }
+            }
+         }
+         else{
+            for (var i=0; i < data.length; i++){
+                array.push(data[i].turn);
+                var max = Math.max.apply(null, array);
+
+                result = max;
+            }
+         }
+
+         return result;
+
      }
 
      function getTurnNumber(data, cellString){
