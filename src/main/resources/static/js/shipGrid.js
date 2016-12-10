@@ -31,6 +31,10 @@ $(document).ready(function(){
                        salvoGridCreate(data);
                        var thisTurnNumber = getCurrentTurnNumber(data);
                        showTurnNumber(thisTurnNumber);
+                       var oldSalvos = getPlayersOldSalvoData(data);
+                       showSalvoes(oldSalvos); //show old salvoes in list on side of grid
+                        //put the old salvo data into the tempArray on first page load
+                        tempArray.push({"turn": "old", "salvoLocations" : getPlayersOldSalvoData(data)})
                     }
                 console.log(data);
         }
@@ -63,6 +67,10 @@ $(document).ready(function(){
 
       function showTurnNumber(thisTurnNumber) {
             $("#turn").text("This is Turn Number: " + thisTurnNumber);
+      }
+
+      function showSalvoes(oldSalvos){
+            $("#old_salvos").text("Your past salvoes:  " + oldSalvos);
       }
 
       function hideShipPlacementInstructions() {
@@ -297,6 +305,7 @@ $(document).ready(function(){
 
 
      var tempArray = [];
+
      function clickToFireSalvos() {
 
         var table = document.getElementById("salvo_table");
@@ -317,16 +326,35 @@ $(document).ready(function(){
                 var text = document.getElementById("turn").innerHTML;
                 var turnNumber = parseInt(text.replace(/[^0-9\.]/g, ''), 10);
 
-                tempArray.push(newLocation);
-                redrawSalvoTable(tempArray);
-                console.log(tempArray);
-                console.log(tempArray.length);
-                if (count == 5){
+                if(tempArray.length < 6){//this is now +1 of expected here and below due to oldSalvoes data in tempArray
+                    if(tempArray.length == 1){
+                        tempArray.push(newLocation);
+                        redrawSalvoTable(tempArray);
+                        console.log(tempArray);
+                        console.log(tempArray.length);
+                    }
+                    else{
+                    //if newLocation matches any old tempArray values, remove the matched value and redraw
+                    //if doesn't match, add new value and redraw
+                        if (checkAndRemoveSalvoFromArray(newLocation, tempArray) == true){
+                        }
+                        else{
+                            tempArray.push(newLocation);
+                            redrawSalvoTable(tempArray);
+                            console.log(tempArray);
+                            console.log(tempArray.length);
+                        }
+
+                    }
+
+                }
+                if (tempArray.length == 6){
+                    tempArray.splice(0, 1);//remove the oldSalvoArray before submitting data
                     finalArray.push({"turn": turnNumber, "salvoLocations": tempArray});
-                    redrawSalvoTable(finalArray);
                     addSubmitSalvoButton(finalArray);
                     count = 0;
                 }
+
                 console.log(finalArray);
 
 //                } //end limit of 5 clicks
@@ -384,6 +412,20 @@ $(document).ready(function(){
         }
         return result;
      }
+
+//     function salvoLocationAlreadyUsed(newLocation, tempArray){
+//          var result = false;
+//          //check to see if a click is the same as previous ship location or click
+//          for (var i=0; i < tempArray.length; i++){
+//             if (newLocation == tempArray[i]){
+//                 alert(tempArray[i] + " is the same as the click: " + newLocation);
+//                 result = true;
+//             }
+//          }
+//        }
+//        return result;
+//     }
+
 
     function middleLocationAlreadyUsed(tempArray, finalArray){
         result = false;
@@ -510,6 +552,18 @@ $(document).ready(function(){
         shipGridCreate(finalArray);
     }
 
+    function checkAndRemoveSalvoFromArray(newLocation, tempArray){
+        var result = false;
+        for(var i=0; i < tempArray.length; i++){
+            if (tempArray[i] == newLocation){
+                tempArray.splice(i, 1);
+                result = true;
+            }
+        }
+        console.log(tempArray);
+        redrawSalvoTable(tempArray);
+        return result;
+    }
 
     //this function checks for multiples, and also if size valid before sending shipType to final array,
     //if not valid size or is a duplicate of a ship already placed, the new ship is not put in array
@@ -684,23 +738,24 @@ $(document).ready(function(){
             return myNewArray;
           }
 
-//        function getOldSalvoData(data) {
-//            var result = []
-//            if (data[0].turn != null){
-//                for( var n=0; n < data.length; n++){
-//                        if (data[n].turn != currentTurn){
-//                            for (var i = 0; i < data[0].salvoLocations.length ; i++) {
-//                                result.push(data[n].salvoLocations[i]);
-//                            }
-//                        }
-//                    }
-//                var myNewArray = [].concat.apply([], result);
-//            }
-//            else{
-//                var myNewArray = [];
-//            }
-//            return myNewArray;
-//        }
+        oldSalvosArray = [];
+        function getPlayersOldSalvoData(data) {
+            var result = []
+            for( var i=0; i< data.gamePlayers.length; i++){
+                if (data.gamePlayers[i].gamePlayer_id == gamePlayer_Id){
+                    for (var j=0; j< data.gamePlayers[i].player_info.salvoes.length; j++){
+                        for (k=0; k< data.gamePlayers[i].player_info.salvoes[j].locations.length; k++){
+                            result.push(data.gamePlayers[i].player_info.salvoes[j].locations[k]);
+                        }
+                        oldSalvosArray = [].concat.apply([], result);
+                    }
+                }
+
+            }
+
+            return oldSalvosArray;
+        }
+
 
           function getOpponentTurnNumber(data, cellString){
               result = "";
@@ -761,28 +816,36 @@ $(document).ready(function(){
 
                     var cellString = myConcatFunction(j,i);
 
-                    if (checkLocations(getSalvoData(data), cellString) == true) {
-                        if (data.gamePlayers){
+                    if (data.gamePlayers && checkLocations(getSalvoData(data), cellString) == true){
                             td.style.backgroundColor = "orange"
                             td.appendChild(document.createTextNode(getTurnNumber(data, cellString)));
-                        }
-                        td.style.backgroundColor = "orange";
+                    }
 
-                        if (data.gamePlayers == null) {
+                    if (data.gamePlayers == null && checkLocations(getSalvoData(data), cellString) == true) {
+                        if (tempArray){
                             for (var a = 0; a < tempArray.length; a++){
-                                if (data[a] == cellString){
+                                if (tempArray[a] == cellString){
                                     var text = currentTurn;
                                     td.appendChild(document.createTextNode(text)); //later get the turn numbers for old and new salvoes
                                     td.style.backgroundColor = "grey";
                                 }
-                            }
-                            if (finalArray[0] != null){
-                                for (var b = 0; b < finalArray[0].salvoLocations.length; b++){
-                                    if (finalArray[0].salvoLocations[b] == cellString){
-                                      var text = currentTurn;
-                                      td.appendChild(document.createTextNode(text)); //later get the turn numbers for old and new salvoes
-                                      td.style.backgroundColor = "grey";
+                                if (tempArray[a].turn == "old" ){ //past salvo info marked here
+                                    for (var b=0; b< tempArray[a].salvoLocations.length; b++){
+                                        if (tempArray[a].salvoLocations[b] == cellString){
+                                            td.style.backgroundColor = "orange";
+                                            td.appendChild(document.createTextNode("-"));
+                                        }
                                     }
+                                }
+                            }
+                        }
+
+                        if (finalArray[0] != null){
+                            for (var b = 0; b < finalArray[0].salvoLocations.length; b++){
+                                if (finalArray[0].salvoLocations[b] == cellString){
+                                  var text = currentTurn;
+                                  td.appendChild(document.createTextNode(text)); //later get the turn numbers for old and new salvoes
+                                  td.style.backgroundColor = "grey";
                                 }
                             }
                         }
@@ -799,7 +862,6 @@ $(document).ready(function(){
 
      var newArray = [];
      function getSalvoData(data){
-//        var newArray = [];
         if (data.gamePlayers != null){
             for (var i=0; i < data.gamePlayers.length; i++){
                 if (data.gamePlayers[i].gamePlayer_id == gamePlayer_Id){ //get only one gamePlayer's salvo locations
@@ -884,5 +946,13 @@ $(document).ready(function(){
 
          return result;
      }
+
+
+//
+//     function makeOldSalvoArray(oldSalvos){
+//         var text = document.getElementById("old_salvos").innerHTML;
+//         var array = text.split(',');
+//         oldSalvoArray = array;
+//     }
 
 });
