@@ -31,7 +31,6 @@ $(document).ready(function(){
                        salvoGridCreate(data);
                        var thisTurnNumber = getCurrentTurnNumber(data);
                        showTurnNumber(thisTurnNumber);
-//                       getMaxTurnNumber(data);
                     }
                 console.log(data);
         }
@@ -685,23 +684,23 @@ $(document).ready(function(){
             return myNewArray;
           }
 
-        function getOldSalvoData(data) {
-            var result = []
-            if (data[0].turn != null){
-                for( var n=0; n < data.length; n++){
-                        if (data[n].turn != currentTurn){
-                            for (var i = 0; i < data[0].salvoLocations.length ; i++) {
-                                result.push(data[n].salvoLocations[i]);
-                            }
-                        }
-                    }
-                var myNewArray = [].concat.apply([], result);
-            }
-            else{
-                var myNewArray = [];
-            }
-            return myNewArray;
-        }
+//        function getOldSalvoData(data) {
+//            var result = []
+//            if (data[0].turn != null){
+//                for( var n=0; n < data.length; n++){
+//                        if (data[n].turn != currentTurn){
+//                            for (var i = 0; i < data[0].salvoLocations.length ; i++) {
+//                                result.push(data[n].salvoLocations[i]);
+//                            }
+//                        }
+//                    }
+//                var myNewArray = [].concat.apply([], result);
+//            }
+//            else{
+//                var myNewArray = [];
+//            }
+//            return myNewArray;
+//        }
 
           function getOpponentTurnNumber(data, cellString){
               result = "";
@@ -767,14 +766,24 @@ $(document).ready(function(){
                             td.style.backgroundColor = "orange"
                             td.appendChild(document.createTextNode(getTurnNumber(data, cellString)));
                         }
-                        else { //make orange old salvoes and grey the new salvoes to be submitted
-                            //if salvo is being placed it will be grey until it is in the server data
-                                td.style.backgroundColor = "orange";
-//                              td.appendChild(document.createTextNode(getTurnNumber(data, cellString))); //later get the turn numbers for old and new salvoes
+                        td.style.backgroundColor = "orange";
 
-                            if (td.style.backgroundColor == "orange" && checkLocations(getOldSalvoData(data), cellString) == true) {
-                                td.style.backgroundColor = "grey"
-//                                td.appendChild(document.createTextNode(getTurnNumber(data, cellString)));
+                        if (data.gamePlayers == null) {
+                            for (var a = 0; a < tempArray.length; a++){
+                                if (data[a] == cellString){
+                                    var text = currentTurn;
+                                    td.appendChild(document.createTextNode(text)); //later get the turn numbers for old and new salvoes
+                                    td.style.backgroundColor = "grey";
+                                }
+                            }
+                            if (finalArray[0] != null){
+                                for (var b = 0; b < finalArray[0].salvoLocations.length; b++){
+                                    if (finalArray[0].salvoLocations[b] == cellString){
+                                      var text = currentTurn;
+                                      td.appendChild(document.createTextNode(text)); //later get the turn numbers for old and new salvoes
+                                      td.style.backgroundColor = "grey";
+                                    }
+                                }
                             }
                         }
                     }
