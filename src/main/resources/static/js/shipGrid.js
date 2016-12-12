@@ -15,7 +15,6 @@ $(document).ready(function(){
         return decodeURIComponent(results[2].replace(/\+/g, " "));
     }
 
-
 //get shipLocation data for a specific gamePlayer_Id
   $.ajax({
         method: "get",
@@ -39,22 +38,6 @@ $(document).ready(function(){
                 console.log(data);
         }
   });//end ajax
-
-  //test post to put canned data salvos in ....
-//      $.post({
-//              url: "/api/games/players/" + gamePlayer_Id + "/salvos",
-//              dataType: "json",
-//              contentType: "application/json",
-//              data: JSON.stringify([{ "turn": "10", "salvoLocations": ["J1", "J8", "J10"] }]),
-//          })
-//          .done(function (data, status, jqXHR) {
-//              console.log(data);
-//              alert("salvo created:" + data.salvoLocations);
-//          })
-//          .fail(function (jqXHR, status, httpError) {
-//              alert("Error: " + status + " " + httpError);
-//          });
-
 
 //show player email on page
       function showPlayerEmail(data) {
@@ -101,7 +84,6 @@ $(document).ready(function(){
                    var td = document.createElement('td');
                         td.appendChild(document.createTextNode(i))
                             tr.appendChild(td)
-
                  }
                  if (i==0 && j!=0) {
                  // output column header 1-10 for grid
@@ -291,7 +273,6 @@ $(document).ready(function(){
                 turns.push(data[i].turn);
             }
          }
-
          currentTurn = arrayMax(turns)+1;
          return currentTurn;
          console.log(turnNumber);
@@ -303,11 +284,8 @@ $(document).ready(function(){
       });
     }
 
-
      var tempArray = [];
-
      function clickToFireSalvos() {
-
         var table = document.getElementById("salvo_table");
         var cells = table.getElementsByTagName("td");
 
@@ -344,9 +322,7 @@ $(document).ready(function(){
                             console.log(tempArray);
                             console.log(tempArray.length);
                         }
-
                     }
-
                 }
                 if (tempArray.length == 6){
                     tempArray.splice(0, 1);//remove the oldSalvoArray before submitting data
@@ -354,10 +330,6 @@ $(document).ready(function(){
                     addSubmitSalvoButton(finalArray);
                     count = 0;
                 }
-
-                console.log(finalArray);
-
-//                } //end limit of 5 clicks
             } //end onClick function
         } //end cell length loop
      } //end clickable table
@@ -412,20 +384,6 @@ $(document).ready(function(){
         }
         return result;
      }
-
-//     function salvoLocationAlreadyUsed(newLocation, tempArray){
-//          var result = false;
-//          //check to see if a click is the same as previous ship location or click
-//          for (var i=0; i < tempArray.length; i++){
-//             if (newLocation == tempArray[i]){
-//                 alert(tempArray[i] + " is the same as the click: " + newLocation);
-//                 result = true;
-//             }
-//          }
-//        }
-//        return result;
-//     }
-
 
     function middleLocationAlreadyUsed(tempArray, finalArray){
         result = false;
@@ -924,7 +882,6 @@ $(document).ready(function(){
 
      function getTurnNumber(data, cellString){
          result = "";
-//         newArray = [];
          if (data.gamePlayers){
             for (var i=0; i < data.gamePlayers.length; i++){
                 if (data.gamePlayers[i].gamePlayer_id == gamePlayer_Id){ //get only one gamePlayer's salvo locations
@@ -946,13 +903,5 @@ $(document).ready(function(){
 
          return result;
      }
-
-
-//
-//     function makeOldSalvoArray(oldSalvos){
-//         var text = document.getElementById("old_salvos").innerHTML;
-//         var array = text.split(',');
-//         oldSalvoArray = array;
-//     }
 
 });
